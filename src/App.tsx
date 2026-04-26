@@ -207,15 +207,7 @@ export default function App() {
               <div className="lg:w-80 shrink-0 space-y-3">
                 <HandDetail hand={selectedHand} entry={selectedEntry} safeMode={safeMode} />
                 <ExportControls range={range} scenarioLabel={scenarioLabel} />
-                <HandLookup
-                  position={myPosition}
-                  onNavigate={(m, pos, openerPos) => {
-                    setMode(m);
-                    setMyPosition(pos);
-                    if (openerPos) setOpenerPosition(openerPos);
-                    setSelectedHand(null);
-                  }}
-                />
+                <HandLookup position={myPosition} />
               </div>
             </div>
           </>

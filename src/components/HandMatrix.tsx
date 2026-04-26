@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import type { HandEntry, Action } from '../types';
 import { RANKS, getHandName, getHandType } from '../types';
 
@@ -90,9 +90,9 @@ export default function HandMatrix({ range, onSelectHand, selectedHand, colorSch
 
         {/* Matrix rows */}
         {RANKS.map((rowRank, row) => (
-          <>
+          <Fragment key={`row-${row}`}>
             {/* Row label */}
-            <div key={`label-${row}`} className="bg-gray-900 p-1.5 text-sm text-gray-400 flex items-center justify-center font-mono font-bold">
+            <div className="bg-gray-900 p-1.5 text-sm text-gray-400 flex items-center justify-center font-mono font-bold">
               {rowRank}
             </div>
             {RANKS.map((_colRank, col) => {
@@ -129,7 +129,7 @@ export default function HandMatrix({ range, onSelectHand, selectedHand, colorSch
                 </button>
               );
             })}
-          </>
+          </Fragment>
         ))}
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { Position, Mode, Action, HandEntry } from '../types';
+import type { Position, Action, HandEntry } from '../types';
 import { RANKS } from '../types';
 import {
   getOpenRange, getVsOpenRange, getVs3BetRange,
@@ -9,7 +9,6 @@ import { HAND_NOTES } from '../data/ranges';
 
 interface Props {
   position: Position;
-  onNavigate: (mode: Mode, position: Position, openerPosition?: Position) => void;
 }
 
 const ACTION_NAMES: Record<Action, string> = {
@@ -180,7 +179,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const CATEGORY_ORDER = ['open', 'vsOpen', 'vs3Bet', 'bbDefense'];
 
-export default function HandLookup({ position, onNavigate: _onNavigate }: Props) {
+export default function HandLookup({ position }: Props) {
   const [rank1, setRank1] = useState<string>('A');
   const [rank2, setRank2] = useState<string>('K');
   const [type, setType] = useState<'s' | 'o'>('s');

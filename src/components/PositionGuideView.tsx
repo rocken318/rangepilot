@@ -85,7 +85,7 @@ export default function PositionGuideView({ onNavigate }: Props) {
         </div>
 
         {/* Hand lookup */}
-        <HandLookup position={selected} onNavigate={onNavigate} />
+        <HandLookup position={selected} />
 
         {/* 要点まとめ */}
         {guide.keyPoints?.length > 0 && (

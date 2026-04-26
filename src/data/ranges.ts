@@ -238,7 +238,7 @@ function makeOpenRange(position: string, width: string): Record<string, HandEntr
 // VS OPEN RANGES（修正版）
 // ============================================================
 
-function makeVsOpenRange(myPos: string, openerPos: string, _width: string): Record<string, HandEntry> {
+function makeVsOpenRange(myPos: string, openerPos: string): Record<string, HandEntry> {
   const r = emptyRange();
 
   if (myPos === 'BB') {
@@ -397,13 +397,13 @@ function makeVsOpenRange(myPos: string, openerPos: string, _width: string): Reco
 // VS 3BET RANGES（修正版）
 // ============================================================
 
-function makeVs3BetRange(myPos: string, _width: string): Record<string, HandEntry> {
+function makeVs3BetRange(myPos: string): Record<string, HandEntry> {
   const r = emptyRange();
 
   if (myPos === 'UTG') {
     setHands(r, [...pp('K','A'), 'AKs'], '4betValue');
     setHands(r, ['AKo'], '4betValue');
-    setHands(r, ['A5s'], '4betBluff', 'Aブロッカー+ナッ���フラッシュ候補。低頻度で4ベット');
+    setHands(r, ['A5s'], '4betBluff', 'Aブロッカー+ナッツフラッシュ候補。低頻度で4ベット');
     setHands(r, ['A4s'], '4betBluff', '低頻度の4ベットブラフ候補');
     setHands(r, pp('Q','J'), 'call', 'セット狙い+強いオーバーペア');
     setHands(r, ['AQs','AJs','KQs'], 'call');
@@ -863,12 +863,12 @@ export function getOpenRange(position: string, width: string): Record<string, Ha
   return makeOpenRange(position, width);
 }
 
-export function getVsOpenRange(myPos: string, openerPos: string, width: string): Record<string, HandEntry> {
-  return makeVsOpenRange(myPos, openerPos, width);
+export function getVsOpenRange(myPos: string, openerPos: string, _width?: string): Record<string, HandEntry> {
+  return makeVsOpenRange(myPos, openerPos);
 }
 
-export function getVs3BetRange(myPos: string, width: string): Record<string, HandEntry> {
-  return makeVs3BetRange(myPos, width);
+export function getVs3BetRange(myPos: string, _width?: string): Record<string, HandEntry> {
+  return makeVs3BetRange(myPos);
 }
 
 export function getBBDefenseRange(openerPos: string, width: string): Record<string, HandEntry> {

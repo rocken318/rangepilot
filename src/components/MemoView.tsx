@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 const HAND_MEMOS_KEY = 'poker-hand-memos';
 const FREE_MEMO_KEY = 'poker-range-memos';
@@ -33,8 +33,8 @@ function saveHandMemos(memos: HandMemo[]) {
 
 export default function MemoView() {
   // ── Hand memos state ──────────────────────────────────────────────────────
-  const [handMemos, setHandMemos] = useState<HandMemo[]>([]);
-  const [handMemosSeedUsed, setHandMemosSeedUsed] = useState(false);
+  const [handMemos, setHandMemos] = useState<HandMemo[]>(() => loadHandMemos() ?? []);
+  const [handMemosSeedUsed, setHandMemosSeedUsed] = useState(() => loadHandMemos() !== null);
 
   const [newHand, setNewHand] = useState('');
   const [newText, setNewText] = useState('');
@@ -43,20 +43,7 @@ export default function MemoView() {
   const [toastTimer, setToastTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Free memo state ───────────────────────────────────────────────────────
-  const [memo, setMemo] = useState('');
-
-  // ── Load on mount ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    const saved = loadHandMemos();
-    if (saved !== null) {
-      setHandMemos(saved);
-      setHandMemosSeedUsed(true);
-    }
-    // else: show example memos without persisting until user interacts
-
-    const savedMemo = localStorage.getItem(FREE_MEMO_KEY);
-    if (savedMemo) setMemo(savedMemo);
-  }, []);
+  const [memo, setMemo] = useState(() => localStorage.getItem(FREE_MEMO_KEY) ?? '');
 
   // Displayed memos: use real ones if seeded, else examples
   const displayedMemos = handMemosSeedUsed ? handMemos : EXAMPLE_MEMOS;
@@ -134,7 +121,7 @@ export default function MemoView() {
   const sortedMemos = [...displayedMemos].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="space-y-8 max-w-3xl mx-auto">
       <h2 className="text-xl font-bold text-white">メモ</h2>
 
       {/* ── Toast ──────────────────────────────────────────────────────────── */}

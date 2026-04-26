@@ -63,7 +63,7 @@ export default function Controls({
   return (
     <div className="space-y-3">
       {/* Mode tabs */}
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap justify-center gap-1.5">
         {modes.map(m => (
           <button
             key={m}
