@@ -10,6 +10,7 @@ import HandMatrix from './components/HandMatrix';
 import Legend from './components/Legend';
 import HandDetail from './components/HandDetail';
 import ExportControls from './components/ExportControls';
+import HandLookup from './components/HandLookup';
 import VillainTypeView from './components/VillainTypeView';
 import MemoView from './components/MemoView';
 import SpotTestView from './components/SpotTestView';
@@ -119,26 +120,26 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f1117] to-[#111827] text-gray-200">
       <header className="bg-gradient-to-r from-gray-900/90 via-gray-900/80 to-indigo-950/80 border-b border-gray-800 sticky top-0 z-20 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto px-3 py-3">
+        <div className="max-w-6xl mx-auto px-3 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-white">
-                🃏 6max NLH Preflop Range Matrix
+              <h1 className="text-xl sm:text-2xl font-bold text-white">
+                RangePilot
               </h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                6maxキャッシュゲーム プリフロップレンジツール
+              <p className="text-sm text-gray-500 mt-0.5">
+                6max NLH プリフロップレンジ & ガイド
               </p>
             </div>
             {safeMode && (
-              <div className="bg-green-600/20 border border-green-600/50 rounded-lg px-3 py-1">
-                <span className="text-xs font-bold text-green-400">安全寄りモード ON</span>
+              <div className="bg-green-600/20 border border-green-600/50 rounded-lg px-4 py-2">
+                <span className="text-sm font-bold text-green-400">安全寄りモード ON</span>
               </div>
             )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-3 py-4 space-y-4 rounded-xl">
+      <main className="max-w-6xl mx-auto px-4 py-5 space-y-5 rounded-xl">
         <Controls
           mode={mode}
           onModeChange={handleModeChange}
@@ -157,9 +158,9 @@ export default function App() {
         />
 
         {showMatrix && (
-          <div className={`rounded-xl px-4 py-2.5 border ${safeMode ? 'bg-green-900/20 border-green-700/50' : 'bg-gray-800/60 border-gray-700'}`}>
-            <p className="text-sm sm:text-base font-bold text-white">{scenarioLabel}</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+          <div className={`rounded-xl px-5 py-3 border ${safeMode ? 'bg-green-900/20 border-green-700/50' : 'bg-gray-800/60 border-gray-700'}`}>
+            <p className="text-base sm:text-lg font-bold text-white">{scenarioLabel}</p>
+            <p className="text-sm text-gray-400 mt-0.5">
               プレイ可能ハンド数: {handCount} / 169
               {hasAnte && (
                 <span className="ml-2 text-amber-400">
@@ -203,9 +204,18 @@ export default function App() {
                   safeMode={safeMode}
                 />
               </div>
-              <div className="lg:w-72 shrink-0 space-y-3">
+              <div className="lg:w-80 shrink-0 space-y-3">
                 <HandDetail hand={selectedHand} entry={selectedEntry} safeMode={safeMode} />
                 <ExportControls range={range} scenarioLabel={scenarioLabel} />
+                <HandLookup
+                  position={myPosition}
+                  onNavigate={(m, pos, openerPos) => {
+                    setMode(m);
+                    setMyPosition(pos);
+                    if (openerPos) setOpenerPosition(openerPos);
+                    setSelectedHand(null);
+                  }}
+                />
               </div>
             </div>
           </>
@@ -214,7 +224,7 @@ export default function App() {
         <Assumptions />
 
         <div className="mt-8 pb-6 border-t border-gray-800/50 pt-4">
-          <p className="text-xs text-gray-500 leading-relaxed bg-gray-800/20 rounded-xl px-4 py-3">
+          <p className="text-sm text-gray-500 leading-relaxed bg-gray-800/20 rounded-xl px-4 py-3">
             ※ このレンジは6maxキャッシュゲーム向けの実戦用目安です。GTO完全解ではありません。相手のタイプ、レイズサイズ、スタック、アンティ有無によって調整してください。
           </p>
         </div>

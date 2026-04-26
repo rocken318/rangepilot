@@ -75,16 +75,16 @@ export default function HandMatrix({ range, onSelectHand, selectedHand, colorSch
 
   return (
     <div ref={matrixRef} id="hand-matrix" className="w-full overflow-x-auto">
-      <div className="inline-grid gap-[1px] bg-gray-800 p-[1px] rounded-xl shadow-lg shadow-black/20" style={{
+      <div className="inline-grid gap-[2px] bg-gray-800 p-[1px] rounded-xl shadow-lg shadow-black/20" style={{
         gridTemplateColumns: `auto repeat(13, 1fr)`,
-        minWidth: '600px',
+        minWidth: '640px',
         width: '100%',
         maxWidth: '800px',
       }}>
         {/* Header row */}
-        <div className="bg-gray-900 p-1 text-xs text-gray-500 flex items-center justify-center font-mono" />
+        <div className="bg-gray-900 p-1.5 text-sm text-gray-500 flex items-center justify-center font-mono" />
         {RANKS.map(rank => (
-          <div key={rank} className="bg-gray-900 p-1 text-xs text-gray-400 flex items-center justify-center font-mono font-bold">
+          <div key={rank} className="bg-gray-900 p-1.5 text-sm text-gray-400 flex items-center justify-center font-mono font-bold">
             {rank}
           </div>
         ))}
@@ -93,7 +93,7 @@ export default function HandMatrix({ range, onSelectHand, selectedHand, colorSch
         {RANKS.map((rowRank, row) => (
           <>
             {/* Row label */}
-            <div key={`label-${row}`} className="bg-gray-900 p-1 text-xs text-gray-400 flex items-center justify-center font-mono font-bold">
+            <div key={`label-${row}`} className="bg-gray-900 p-1.5 text-sm text-gray-400 flex items-center justify-center font-mono font-bold">
               {rowRank}
             </div>
             {RANKS.map((_colRank, col) => {
@@ -109,7 +109,7 @@ export default function HandMatrix({ range, onSelectHand, selectedHand, colorSch
                   key={`${row}-${col}`}
                   onClick={() => onSelectHand(handName)}
                   className={`
-                    relative p-0.5 text-center cursor-pointer transition-all duration-150
+                    relative p-1 text-center cursor-pointer transition-all duration-150
                     ${colorClass}
                     ${isSelected ? 'ring-2 ring-white ring-offset-1 ring-offset-gray-900 z-10 scale-110' : ''}
                     ${handType === 'pair' ? 'font-bold' : ''}
@@ -117,15 +117,15 @@ export default function HandMatrix({ range, onSelectHand, selectedHand, colorSch
                   style={{ aspectRatio: '1', minWidth: 0, minHeight: 0 }}
                   title={`${handName}: ${ACTION_LABELS[entry.action]}${hasSafeDiff ? ` (通常: ${ACTION_LABELS[entry.normalAction!]})` : ''}`}
                 >
-                  <div className="text-[10px] sm:text-xs leading-tight font-mono">
+                  <div className="text-xs sm:text-sm leading-tight font-mono">
                     {handName}
                   </div>
-                  <div className="text-[7px] sm:text-[9px] leading-none opacity-80">
+                  <div className="text-[9px] sm:text-xs leading-none opacity-80">
                     {ACTION_LABELS[entry.action]}
                   </div>
                   {/* Safe mode diff indicator */}
                   {hasSafeDiff && (
-                    <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-green-400 rounded-full" />
+                    <div className="absolute top-0 right-0 w-2 h-2 bg-green-400 rounded-full" />
                   )}
                 </button>
               );

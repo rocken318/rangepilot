@@ -63,12 +63,12 @@ export default function Controls({
   return (
     <div className="space-y-3">
       {/* Mode tabs */}
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1.5">
         {modes.map(m => (
           <button
             key={m}
             onClick={() => onModeChange(m)}
-            className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`px-4 py-2.5 rounded-xl text-sm sm:text-base font-medium transition-colors min-h-[44px] ${
               mode === m
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
@@ -79,13 +79,13 @@ export default function Controls({
         ))}
       </div>
 
-      {/* Sub-controls row */}
-      <div className="flex flex-wrap gap-2 items-center">
+      {/* Sub-controls card */}
+      <div className="bg-gray-800/40 rounded-2xl p-3 space-y-3 border border-gray-700/50">
         {/* Safe mode toggle */}
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => onSafeModeChange(!safeMode)}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors border ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-bold transition-colors border min-h-[44px] ${
               safeMode
                 ? 'bg-green-600 text-white border-green-500 shadow-lg shadow-green-600/20'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-gray-700'
@@ -98,13 +98,13 @@ export default function Controls({
         {/* Position select */}
         {showPositionSelect && !showSbVsBbScenario && (
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-gray-400">自分:</label>
-            <div className="flex gap-0.5">
+            <label className="text-sm text-gray-400 font-medium">自分:</label>
+            <div className="flex gap-1.5">
               {availableMyPos.map(pos => (
                 <button
                   key={pos}
                   onClick={() => onMyPositionChange(pos)}
-                  className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] min-w-[48px] ${
                     myPosition === pos
                       ? 'bg-emerald-600 text-white'
                       : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -120,11 +120,11 @@ export default function Controls({
         {/* SB vs BB scenario */}
         {showSbVsBbScenario && (
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-gray-400">���ナリオ:</label>
-            <div className="flex gap-0.5">
+            <label className="text-sm text-gray-400 font-medium">シナリオ:</label>
+            <div className="flex gap-1.5">
               <button
                 onClick={() => onSbVsBbScenarioChange('sbOpen')}
-                className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] ${
                   sbVsBbScenario === 'sbOpen'
                     ? 'bg-emerald-600 text-white'
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -134,7 +134,7 @@ export default function Controls({
               </button>
               <button
                 onClick={() => onSbVsBbScenarioChange('bbDefVsSb')}
-                className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] ${
                   sbVsBbScenario === 'bbDefVsSb'
                     ? 'bg-emerald-600 text-white'
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -149,13 +149,13 @@ export default function Controls({
         {/* Opener position */}
         {showOpenerSelect && availableOpenerPos.length > 0 && (
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-gray-400">相手:</label>
-            <div className="flex gap-0.5">
+            <label className="text-sm text-gray-400 font-medium">相手:</label>
+            <div className="flex gap-1.5">
               {availableOpenerPos.map(pos => (
                 <button
                   key={pos}
                   onClick={() => onOpenerPositionChange(pos)}
-                  className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] min-w-[48px] ${
                     openerPosition === pos
                       ? 'bg-orange-600 text-white'
                       : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -171,13 +171,13 @@ export default function Controls({
         {/* Range width */}
         {showRangeWidth && (
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-gray-400">レンジ幅:</label>
-            <div className="flex gap-0.5">
+            <label className="text-sm text-gray-400 font-medium">レンジ幅:</label>
+            <div className="flex gap-1.5">
               {rangeWidths.map(w => (
                 <button
                   key={w}
                   onClick={() => onRangeWidthChange(w)}
-                  className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] ${
                     rangeWidth === w
                       ? 'bg-violet-600 text-white'
                       : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -192,10 +192,10 @@ export default function Controls({
 
         {/* Ante toggle */}
         <div className="flex items-center gap-1.5">
-          <label className="text-xs text-gray-400">アンティ:</label>
+          <label className="text-sm text-gray-400 font-medium">アンティ:</label>
           <button
             onClick={() => onAnteChange(!hasAnte)}
-            className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] ${
               hasAnte
                 ? 'bg-amber-600 text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -208,7 +208,7 @@ export default function Controls({
 
       {/* Safe mode description */}
       {safeMode && (
-        <div className="bg-green-900/20 border border-green-700/40 rounded-xl px-3 py-2 text-xs text-green-300/80">
+        <div className="bg-green-900/20 border border-green-700/40 rounded-xl px-4 py-3 text-sm text-green-300/80">
           🛡 安全寄りモード: コール範囲を狭め、3ベット/4ベットブラフを制限、弱いオフスートをフォールドに変更しています。通常モードとの差分はセルをクリックして確認できます。
         </div>
       )}

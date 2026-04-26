@@ -220,7 +220,7 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
   return (
     <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
       {/* Title */}
-      <h2 className="text-base font-semibold text-gray-200 mb-3">
+      <h2 className="text-lg font-semibold text-gray-200 mb-3">
         🔍 ハンド別ガイド
       </h2>
 
@@ -228,13 +228,13 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
       <div className="space-y-3 mb-4">
         {/* Card 1 */}
         <div>
-          <div className="text-xs text-gray-400 mb-1">カード1</div>
-          <div className="flex flex-wrap gap-1">
+          <div className="text-sm font-medium text-gray-400 mb-1">カード1</div>
+          <div className="flex flex-wrap gap-1.5">
             {RANKS.map(r => (
               <button
                 key={r}
                 onClick={() => setRank1(r)}
-                className={`text-xs px-1.5 py-1 rounded font-mono font-semibold transition-colors ${
+                className={`text-sm px-2.5 py-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded font-mono font-semibold transition-colors ${
                   rank1 === r
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -248,13 +248,13 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
 
         {/* Card 2 */}
         <div>
-          <div className="text-xs text-gray-400 mb-1">カード2</div>
-          <div className="flex flex-wrap gap-1">
+          <div className="text-sm font-medium text-gray-400 mb-1">カード2</div>
+          <div className="flex flex-wrap gap-1.5">
             {RANKS.map(r => (
               <button
                 key={r}
                 onClick={() => setRank2(r)}
-                className={`text-xs px-1.5 py-1 rounded font-mono font-semibold transition-colors ${
+                className={`text-sm px-2.5 py-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded font-mono font-semibold transition-colors ${
                   rank2 === r
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -268,16 +268,16 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
 
         {/* Type selector */}
         <div>
-          <div className="text-xs text-gray-400 mb-1">タイプ</div>
+          <div className="text-sm font-medium text-gray-400 mb-1">タイプ</div>
           {isPair ? (
-            <span className="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300 font-semibold">
+            <span className="text-sm px-4 py-2.5 min-h-[40px] rounded bg-gray-700 text-gray-300 font-semibold">
               ペア
             </span>
           ) : (
             <div className="flex gap-1">
               <button
                 onClick={() => setType('s')}
-                className={`text-xs px-2 py-1 rounded font-semibold transition-colors ${
+                className={`text-sm px-4 py-2.5 min-h-[40px] rounded font-semibold transition-colors ${
                   type === 's'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -287,7 +287,7 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
               </button>
               <button
                 onClick={() => setType('o')}
-                className={`text-xs px-2 py-1 rounded font-semibold transition-colors ${
+                className={`text-sm px-4 py-2.5 min-h-[40px] rounded font-semibold transition-colors ${
                   type === 'o'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -302,7 +302,7 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
 
       {/* Hand name display */}
       <div className="flex items-center gap-3 mb-3">
-        <span className="text-2xl font-mono font-bold text-white">
+        <span className="text-3xl font-mono font-bold text-white">
           {handName}
         </span>
         <span className="text-xs text-gray-400">
@@ -324,7 +324,7 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
           if (!group || group.length === 0) return null;
           return (
             <div key={category}>
-              <div className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
+              <div className="text-sm font-semibold text-gray-400 mb-1 uppercase tracking-wide">
                 {CATEGORY_LABELS[category]}
               </div>
               <div className="space-y-1">
@@ -334,18 +334,18 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
                   return (
                     <div
                       key={idx}
-                      className={`flex items-start gap-2 pl-2 border-l-2 ${getActionBorderClass(action)} py-1`}
+                      className={`flex items-start gap-2 pl-2 border-l-2 ${getActionBorderClass(action)} py-2`}
                     >
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs text-gray-300">{scenario.label}</span>
+                        <span className="text-sm text-gray-300">{scenario.label}</span>
                         {entry?.note && (
-                          <p className="text-xs text-gray-500 mt-0.5 truncate" title={entry.note}>
+                          <p className="text-sm text-gray-500 mt-0.5 truncate" title={entry.note}>
                             {entry.note}
                           </p>
                         )}
                       </div>
                       <span
-                        className={`flex-shrink-0 text-xs px-1.5 py-0.5 rounded font-semibold ${getActionBadgeClass(action)}`}
+                        className={`flex-shrink-0 text-sm px-2 py-1 rounded font-semibold ${getActionBadgeClass(action)}`}
                       >
                         {ACTION_NAMES[action] ?? action}
                       </span>
@@ -359,7 +359,7 @@ export default function HandLookup({ position, onNavigate: _onNavigate }: Props)
       </div>
 
       {/* Summary line */}
-      <div className="mt-3 pt-3 border-t border-gray-700 text-xs text-gray-400">
+      <div className="mt-3 pt-3 border-t border-gray-700 text-sm text-gray-400">
         {totalCount > 0 ? (
           <>
             <span className="text-green-400 font-semibold">{playCount}</span>

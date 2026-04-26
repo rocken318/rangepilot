@@ -130,16 +130,16 @@ export default function SpotTestView({ safeMode }: Props) {
     <div className="max-w-2xl mx-auto space-y-4">
       {/* Header with score */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-white">スポットテスト</h2>
+        <h2 className="text-2xl font-bold text-white">スポットテスト</h2>
         <div className="flex items-center gap-2">
           {safeMode && (
             <div className="bg-green-600/20 border border-green-600/50 rounded-lg px-2 py-0.5">
               <span className="text-xs font-bold text-green-400">安全寄り ON</span>
             </div>
           )}
-          <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-right">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-right">
             <div className="text-xs text-gray-400">スコア</div>
-            <div className="text-sm font-bold text-white">
+            <div className="text-lg font-bold text-white">
               {score.correct} <span className="text-gray-500 font-normal">/ {score.total}</span>
             </div>
           </div>
@@ -147,29 +147,29 @@ export default function SpotTestView({ safeMode }: Props) {
       </div>
 
       {/* Question card */}
-      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-5 space-y-4 shadow-lg shadow-black/10">
+      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 space-y-4 shadow-lg shadow-black/10">
         {/* Situation label */}
-        <div className="text-xs font-mono text-gray-400 bg-gray-900 rounded-lg px-3 py-1.5 inline-block">
+        <div className="text-sm font-mono text-gray-400 bg-gray-900 rounded-lg px-4 py-2 inline-block">
           {q.situationLabel}
         </div>
 
         {/* Question text */}
-        <p className="text-base text-gray-200 leading-relaxed">
+        <p className="text-lg text-gray-200 leading-relaxed">
           {q.question}
         </p>
 
         {/* Hand display */}
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-400 uppercase tracking-wide">あなたのハンド</span>
-          <span className="text-4xl font-mono font-bold text-white bg-gray-900 rounded-lg px-4 py-2 border border-gray-600 tracking-wider">
+          <span className="text-4xl font-mono font-bold text-white bg-gray-900 rounded-lg px-5 py-3 border border-gray-600 tracking-wider">
             {q.hand}
           </span>
         </div>
 
         {/* Choice buttons */}
         <div className="space-y-2">
-          <p className="text-xs text-gray-400">アクションを選んでください</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="text-sm text-gray-400">アクションを選んでください</p>
+          <div className="flex flex-wrap gap-3">
             {q.choices.map((choice) => {
               const isSelected = selectedChoice === choice;
               const isCorrectChoice =
@@ -200,7 +200,7 @@ export default function SpotTestView({ safeMode }: Props) {
                   onClick={() => handleChoice(choice)}
                   disabled={answered}
                   className={`
-                    px-5 py-2.5 rounded-xl font-semibold text-base transition-all duration-150
+                    px-8 py-4 rounded-xl font-semibold text-lg min-h-[56px] min-w-[100px] shadow-md transition-all duration-150
                     ${CHOICE_BUTTON_COLORS[choice]}
                     ${extraClass}
                     ${answered ? 'cursor-not-allowed' : 'cursor-pointer'}
@@ -216,7 +216,7 @@ export default function SpotTestView({ safeMode }: Props) {
 
       {/* Result panel */}
       {answered && resultConfig && (
-        <div className={`border rounded-xl p-5 space-y-4 ${resultConfig.borderClass} ${resultConfig.bgClass}`}>
+        <div className={`border rounded-xl p-6 space-y-4 ${resultConfig.borderClass} ${resultConfig.bgClass}`}>
           {/* Result badge + answer label */}
           <div className="flex items-center gap-3 flex-wrap">
             <span className={`text-2xl font-bold ${resultConfig.textClass}`}>
@@ -239,7 +239,7 @@ export default function SpotTestView({ safeMode }: Props) {
           {q.explanation && (
             <div className="space-y-1">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">解説</p>
-              <p className="text-sm text-gray-200 leading-relaxed">{q.explanation}</p>
+              <p className="text-base text-gray-200 leading-relaxed">{q.explanation}</p>
             </div>
           )}
 
@@ -249,15 +249,15 @@ export default function SpotTestView({ safeMode }: Props) {
               <p className="text-xs font-semibold text-green-400 uppercase tracking-wide">
                 安全寄りモード {safeMode ? '(現在ON)' : '(参考)'}
               </p>
-              <p className="text-sm text-gray-300 leading-relaxed">{q.safeExplanation}</p>
+              <p className="text-base text-gray-300 leading-relaxed">{q.safeExplanation}</p>
             </div>
           )}
 
           {/* Beginner tip */}
           {q.beginnerTip && (
-            <div className="bg-blue-900/30 border border-blue-700/40 rounded-lg p-3 space-y-1">
+            <div className="bg-blue-900/30 border border-blue-700/40 rounded-lg p-4 space-y-1">
               <p className="text-xs font-semibold text-blue-400 uppercase tracking-wide">初心者ヒント</p>
-              <p className="text-sm text-blue-200 leading-relaxed">{q.beginnerTip}</p>
+              <p className="text-base text-blue-200 leading-relaxed">{q.beginnerTip}</p>
             </div>
           )}
 
@@ -265,22 +265,22 @@ export default function SpotTestView({ safeMode }: Props) {
           {q.contextNote && (
             <div className="space-y-1">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">状況別まとめ</p>
-              <p className="text-sm text-gray-300 leading-relaxed font-mono">{q.contextNote}</p>
+              <p className="text-base text-gray-300 leading-relaxed font-mono">{q.contextNote}</p>
             </div>
           )}
 
           {/* Large size note */}
           {q.largeSizeNote && (
-            <div className="bg-amber-900/30 border border-amber-700/40 rounded-lg p-3 space-y-1">
+            <div className="bg-amber-900/30 border border-amber-700/40 rounded-lg p-4 space-y-1">
               <p className="text-xs font-semibold text-amber-400 uppercase tracking-wide">サイズが大きい場合</p>
-              <p className="text-sm text-amber-200 leading-relaxed">{q.largeSizeNote}</p>
+              <p className="text-base text-amber-200 leading-relaxed">{q.largeSizeNote}</p>
             </div>
           )}
 
           {/* Next button */}
           <button
             onClick={handleNext}
-            className="w-full mt-2 py-3 bg-gray-700 hover:bg-gray-600 active:bg-gray-800 text-white font-semibold rounded-xl transition-colors text-base"
+            className="w-full mt-2 py-4 bg-gray-700 hover:bg-gray-600 active:bg-gray-800 text-white font-bold rounded-xl transition-colors text-lg min-h-[56px]"
           >
             次の問題へ →
           </button>
