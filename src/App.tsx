@@ -27,20 +27,45 @@ export default function App() {
   const [sbVsBbScenario, setSbVsBbScenario] = useState<'sbOpen' | 'bbDefVsSb'>('sbOpen');
   const [safeMode, setSafeMode] = useState(false);
 
-  const handleModeChange = (m: Mode) => {
-    setMode(m);
-    setSelectedHand(null);
-    if (m === 'open') setMyPosition('UTG');
-    if (m === 'vsOpen') { setMyPosition('HJ'); setOpenerPosition('UTG'); }
-    if (m === 'vs3Bet') setMyPosition('UTG');
-    if (m === 'bbDefense') { setMyPosition('BB'); setOpenerPosition('UTG'); }
-    if (m === 'sbVsBb') { setMyPosition('SB'); setSbVsBbScenario('sbOpen'); }
-  };
+  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'positionGuide'];
 
-  const handleMyPositionChange = (pos: Position) => {
+  function getAvailableScenarios(pos: Position): { mode: Mode; sbScenario?: 'sbOpen' | 'bbDefVsSb' }[] {
+    switch (pos) {
+      case 'UTG': return [{ mode: 'open' }, { mode: 'vs3Bet' }];
+      case 'HJ': case 'CO': case 'BTN': return [{ mode: 'open' }, { mode: 'vsOpen' }, { mode: 'vs3Bet' }];
+      case 'SB': return [{ mode: 'sbVsBb', sbScenario: 'sbOpen' }, { mode: 'vsOpen' }, { mode: 'vs3Bet' }];
+      case 'BB': return [{ mode: 'bbDefense' }, { mode: 'sbVsBb', sbScenario: 'bbDefVsSb' }];
+    }
+  }
+
+  const handlePositionChange = (pos: Position) => {
     setMyPosition(pos);
     setSelectedHand(null);
-    if (mode === 'vsOpen') {
+
+    const scenarios = getAvailableScenarios(pos);
+
+    // If in utility mode, switch to first range scenario for this position
+    if (UTILITY_MODES.includes(mode)) {
+      setMode(scenarios[0].mode);
+      if (scenarios[0].sbScenario) setSbVsBbScenario(scenarios[0].sbScenario);
+      return;
+    }
+
+    // Check if current mode is still available for new position
+    const stillAvailable = scenarios.some(s => {
+      if (s.mode !== mode) return false;
+      if (s.mode === 'sbVsBb' && s.sbScenario !== sbVsBbScenario) return false;
+      return true;
+    });
+
+    if (!stillAvailable) {
+      setMode(scenarios[0].mode);
+      if (scenarios[0].sbScenario) setSbVsBbScenario(scenarios[0].sbScenario);
+    }
+
+    // Adjust opener if it conflicts with new position
+    const effectiveMode = stillAvailable ? mode : scenarios[0].mode;
+    if (effectiveMode === 'vsOpen') {
       const posOrder: Position[] = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
       const myIdx = posOrder.indexOf(pos);
       const opIdx = posOrder.indexOf(openerPosition);
@@ -48,6 +73,27 @@ export default function App() {
         setOpenerPosition(posOrder[0]);
       }
     }
+  };
+
+  const handleScenarioChange = (scenarioMode: Mode, sbScenario?: 'sbOpen' | 'bbDefVsSb') => {
+    setMode(scenarioMode);
+    // Don't reset selectedHand — user can compare same hand across scenarios
+    if (sbScenario !== undefined) setSbVsBbScenario(sbScenario);
+
+    // Set default opener for vsOpen if current one is invalid
+    if (scenarioMode === 'vsOpen') {
+      const posOrder: Position[] = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
+      const myIdx = posOrder.indexOf(myPosition);
+      const opIdx = posOrder.indexOf(openerPosition);
+      if (opIdx >= myIdx) {
+        setOpenerPosition(posOrder[0]);
+      }
+    }
+  };
+
+  const handleUtilityModeChange = (m: Mode) => {
+    setMode(m);
+    setSelectedHand(null);
   };
 
   const range = useMemo((): Record<string, HandEntry> => {
@@ -142,17 +188,17 @@ export default function App() {
       <main className="max-w-5xl mx-auto px-4 py-5 space-y-5">
         <Controls
           mode={mode}
-          onModeChange={handleModeChange}
           myPosition={myPosition}
-          onMyPositionChange={handleMyPositionChange}
+          onPositionChange={handlePositionChange}
+          onScenarioChange={handleScenarioChange}
+          onUtilityModeChange={handleUtilityModeChange}
           openerPosition={openerPosition}
-          onOpenerPositionChange={(p) => { setOpenerPosition(p); setSelectedHand(null); }}
+          onOpenerPositionChange={(p) => { setOpenerPosition(p); }}
           rangeWidth={rangeWidth}
-          onRangeWidthChange={(w) => { setRangeWidth(w); setSelectedHand(null); }}
+          onRangeWidthChange={(w) => { setRangeWidth(w); }}
           hasAnte={hasAnte}
           onAnteChange={setHasAnte}
           sbVsBbScenario={sbVsBbScenario}
-          onSbVsBbScenarioChange={(s) => { setSbVsBbScenario(s); setSelectedHand(null); }}
           safeMode={safeMode}
           onSafeModeChange={setSafeMode}
         />
