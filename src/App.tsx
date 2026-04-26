@@ -139,7 +139,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-5 space-y-5 rounded-xl">
+      <main className="max-w-6xl mx-auto px-4 py-5 space-y-5">
         <Controls
           mode={mode}
           onModeChange={handleModeChange}
@@ -158,7 +158,7 @@ export default function App() {
         />
 
         {showMatrix && (
-          <div className={`rounded-xl px-5 py-3 border ${safeMode ? 'bg-green-900/20 border-green-700/50' : 'bg-gray-800/60 border-gray-700'}`}>
+          <div className={`mx-auto w-full max-w-5xl rounded-xl px-5 py-3 border ${safeMode ? 'bg-green-900/20 border-green-700/50' : 'bg-gray-800/60 border-gray-700'}`}>
             <p className="text-base sm:text-lg font-bold text-white">{scenarioLabel}</p>
             <p className="text-sm text-gray-400 mt-0.5">
               プレイ可能ハンド数: {handCount} / 169
@@ -194,7 +194,7 @@ export default function App() {
           <>
             <Legend mode={mode === 'sbVsBb' ? (sbVsBbScenario === 'sbOpen' ? 'open' : 'bbDefense') : mode} />
 
-            <div className="flex flex-col lg:flex-row gap-5 mx-auto lg:max-w-[1120px]">
+            <div className="mx-auto flex w-full flex-col gap-5 lg:max-w-[1120px] lg:flex-row">
               <div className="flex-1 min-w-0">
                 <HandMatrix
                   range={range}
@@ -215,7 +215,7 @@ export default function App() {
 
         <Assumptions />
 
-        <div className="mt-8 pb-6 border-t border-gray-800/50 pt-4">
+        <div className="mx-auto mt-8 w-full max-w-5xl border-t border-gray-800/50 pt-4 pb-6">
           <p className="text-sm text-gray-500 leading-relaxed bg-gray-800/20 rounded-xl px-4 py-3">
             ※ このレンジは6maxキャッシュゲーム向けの実戦用目安です。GTO完全解ではありません。相手のタイプ、レイズサイズ、スタック、アンティ有無によって調整してください。
           </p>

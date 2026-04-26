@@ -61,7 +61,7 @@ export default function Controls({
   const showSbVsBbScenario = mode === 'sbVsBb';
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto w-full max-w-5xl space-y-3">
       {/* Mode tabs */}
       <div className="flex flex-wrap justify-center gap-1.5">
         {modes.map(m => (
@@ -82,7 +82,7 @@ export default function Controls({
       {/* Sub-controls card */}
       <div className="bg-gray-800/40 rounded-2xl p-3 space-y-3 border border-gray-700/50">
         {/* Safe mode toggle */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
           <button
             onClick={() => onSafeModeChange(!safeMode)}
             className={`px-4 py-2.5 rounded-lg text-sm font-bold transition-colors border min-h-[44px] ${
@@ -97,9 +97,9 @@ export default function Controls({
 
         {/* Position select */}
         {showPositionSelect && !showSbVsBbScenario && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-center">
             <label className="text-sm text-gray-400 font-medium">自分:</label>
-            <div className="flex gap-1.5">
+            <div className="flex flex-wrap justify-center gap-1.5">
               {availableMyPos.map(pos => (
                 <button
                   key={pos}
@@ -119,9 +119,9 @@ export default function Controls({
 
         {/* SB vs BB scenario */}
         {showSbVsBbScenario && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-center">
             <label className="text-sm text-gray-400 font-medium">シナリオ:</label>
-            <div className="flex gap-1.5">
+            <div className="flex flex-wrap justify-center gap-1.5">
               <button
                 onClick={() => onSbVsBbScenarioChange('sbOpen')}
                 className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] ${
@@ -148,9 +148,9 @@ export default function Controls({
 
         {/* Opener position */}
         {showOpenerSelect && availableOpenerPos.length > 0 && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-center">
             <label className="text-sm text-gray-400 font-medium">相手:</label>
-            <div className="flex gap-1.5">
+            <div className="flex flex-wrap justify-center gap-1.5">
               {availableOpenerPos.map(pos => (
                 <button
                   key={pos}
@@ -170,9 +170,9 @@ export default function Controls({
 
         {/* Range width */}
         {showRangeWidth && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-center">
             <label className="text-sm text-gray-400 font-medium">レンジ幅:</label>
-            <div className="flex gap-1.5">
+            <div className="flex flex-wrap justify-center gap-1.5">
               {rangeWidths.map(w => (
                 <button
                   key={w}
@@ -191,7 +191,7 @@ export default function Controls({
         )}
 
         {/* Ante toggle */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
           <label className="text-sm text-gray-400 font-medium">アンティ:</label>
           <button
             onClick={() => onAnteChange(!hasAnte)}

@@ -47,7 +47,7 @@ export default function Legend({ mode }: Props) {
   const items = LEGENDS[mode] || LEGENDS.open;
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 bg-gray-800/30 rounded-xl px-4 py-3">
+    <div className="mx-auto flex w-full max-w-5xl flex-wrap justify-center gap-4 rounded-xl bg-gray-800/30 px-4 py-3">
       {items.map(item => (
         <div key={item.label} className="flex items-center gap-1.5">
           <div className={`w-5 h-5 rounded-md ${item.color}`} />

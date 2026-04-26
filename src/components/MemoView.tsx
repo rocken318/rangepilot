@@ -121,7 +121,7 @@ export default function MemoView() {
   const sortedMemos = [...displayedMemos].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
-    <div className="space-y-8 max-w-3xl mx-auto">
+    <div className="mx-auto w-full max-w-3xl space-y-8">
       <h2 className="text-xl font-bold text-white">メモ</h2>
 
       {/* ── Toast ──────────────────────────────────────────────────────────── */}

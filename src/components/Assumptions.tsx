@@ -4,7 +4,7 @@ export default function Assumptions() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="rounded-lg border border-gray-700 bg-gray-800/50 overflow-hidden">
+    <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-lg border border-gray-700 bg-gray-800/50">
       {/* Toggle bar */}
       <button
         onClick={() => setExpanded(v => !v)}

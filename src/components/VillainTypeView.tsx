@@ -4,7 +4,7 @@ export default function VillainTypeView() {
   const types = Object.entries(VILLAIN_ADJUSTMENTS);
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="mx-auto w-full max-w-3xl space-y-6">
       <h2 className="text-xl font-bold text-white">相手タイプ別 レンジ調整ガイド</h2>
       <p className="text-sm text-gray-400">
         相手のプレイスタイルに応じて、基本レンジからどのように調整するかのガイドラインです。
