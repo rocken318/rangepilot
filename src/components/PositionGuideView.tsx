@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Position, Mode } from '../types';
 import { getPositionGuide } from '../data/positionGuides';
-import type { PositionGuide } from '../data/positionGuides';
+import type { PositionGuide, DecisionFlow } from '../data/positionGuides';
 import HandLookup from './HandLookup';
 
 interface Props {
@@ -86,6 +86,56 @@ export default function PositionGuideView({ onNavigate }: Props) {
 
         {/* Hand lookup */}
         <HandLookup position={selected} onNavigate={onNavigate} />
+
+        {/* 要点まとめ */}
+        {guide.keyPoints?.length > 0 && (
+          <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-xl p-5 space-y-2">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <span className="text-indigo-400">★</span>
+              要点まとめ
+            </h3>
+            <ul className="space-y-2">
+              {guide.keyPoints.map((point, i) => (
+                <li key={i} className="flex gap-3 items-start">
+                  <span className="text-indigo-400 font-bold text-sm mt-0.5 shrink-0">{i + 1}.</span>
+                  <span className="text-base text-gray-200 leading-relaxed">{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 判断フロー */}
+        {guide.decisionFlows?.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <span className="text-cyan-400">▶</span>
+              判断フロー
+            </h3>
+            {guide.decisionFlows.map((flow: DecisionFlow, fi: number) => (
+              <div key={fi} className="bg-gray-800/60 border border-gray-600/50 rounded-xl p-5 space-y-3">
+                <h4 className="text-sm font-bold text-cyan-300">{flow.title}</h4>
+                <div className="space-y-1">
+                  {flow.steps.map((step, si) => (
+                    <div key={si} className="flex items-start gap-2">
+                      <div className="flex flex-col items-center shrink-0 mt-1">
+                        <div className={`w-3 h-3 rounded-full border-2 ${
+                          si === 0 ? 'bg-cyan-500 border-cyan-400' :
+                          si === flow.steps.length - 1 ? 'bg-gray-500 border-gray-400' :
+                          'bg-gray-700 border-gray-500'
+                        }`} />
+                        {si < flow.steps.length - 1 && (
+                          <div className="w-0.5 h-4 bg-gray-600" />
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-300 leading-relaxed pb-1">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="space-y-3">
           {/* ポジションの特徴 */}
