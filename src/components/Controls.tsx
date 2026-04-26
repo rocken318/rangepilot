@@ -61,7 +61,7 @@ export default function Controls({
   const showSbVsBbScenario = mode === 'sbVsBb';
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-3">
+    <div className="space-y-3">
       {/* Mode tabs */}
       <div className="flex flex-wrap justify-center gap-1.5">
         {modes.map(m => (

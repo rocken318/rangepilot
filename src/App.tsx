@@ -120,7 +120,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f1117] to-[#111827] text-gray-200">
       <header className="bg-gradient-to-r from-gray-900/90 via-gray-900/80 to-indigo-950/80 border-b border-gray-800 sticky top-0 z-20 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-3 py-4">
+        <div className="max-w-5xl mx-auto px-3 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-white">
@@ -139,7 +139,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-5 space-y-5">
+      <main className="max-w-5xl mx-auto px-4 py-5 space-y-5">
         <Controls
           mode={mode}
           onModeChange={handleModeChange}
@@ -158,7 +158,7 @@ export default function App() {
         />
 
         {showMatrix && (
-          <div className={`mx-auto w-full max-w-5xl rounded-xl px-5 py-3 border ${safeMode ? 'bg-green-900/20 border-green-700/50' : 'bg-gray-800/60 border-gray-700'}`}>
+          <div className={`rounded-xl px-5 py-3 border ${safeMode ? 'bg-green-900/20 border-green-700/50' : 'bg-gray-800/60 border-gray-700'}`}>
             <p className="text-base sm:text-lg font-bold text-white">{scenarioLabel}</p>
             <p className="text-sm text-gray-400 mt-0.5">
               プレイ可能ハンド数: {handCount} / 169
@@ -194,7 +194,7 @@ export default function App() {
           <>
             <Legend mode={mode === 'sbVsBb' ? (sbVsBbScenario === 'sbOpen' ? 'open' : 'bbDefense') : mode} />
 
-            <div className="mx-auto flex w-full flex-col gap-5 lg:max-w-[1120px] lg:flex-row">
+            <div className="flex w-full flex-col gap-5 lg:flex-row">
               <div className="flex-1 min-w-0">
                 <HandMatrix
                   range={range}
@@ -215,7 +215,7 @@ export default function App() {
 
         <Assumptions />
 
-        <div className="mx-auto mt-8 w-full max-w-5xl border-t border-gray-800/50 pt-4 pb-6">
+        <div className="mt-8 border-t border-gray-800/50 pt-4 pb-6">
           <p className="text-sm text-gray-500 leading-relaxed bg-gray-800/20 rounded-xl px-4 py-3">
             ※ このレンジは6maxキャッシュゲーム向けの実戦用目安です。GTO完全解ではありません。相手のタイプ、レイズサイズ、スタック、アンティ有無によって調整してください。
           </p>
