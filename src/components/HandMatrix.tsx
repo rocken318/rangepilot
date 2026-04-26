@@ -74,11 +74,10 @@ export default function HandMatrix({ range, onSelectHand, selectedHand, colorSch
   const colors = ACTION_COLORS[colorScheme] || ACTION_COLORS.open;
 
   return (
-    <div ref={matrixRef} id="hand-matrix" className="w-full overflow-x-auto">
-      <div className="inline-grid gap-[2px] bg-gray-800 p-[1px] rounded-xl shadow-lg shadow-black/20" style={{
+    <div ref={matrixRef} id="hand-matrix" className="w-full overflow-x-auto flex justify-center">
+      <div className="grid gap-[2px] bg-gray-800 p-[2px] rounded-xl shadow-lg shadow-black/20 w-full" style={{
         gridTemplateColumns: `auto repeat(13, 1fr)`,
         minWidth: '640px',
-        width: '100%',
         maxWidth: '800px',
       }}>
         {/* Header row */}

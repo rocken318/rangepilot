@@ -194,8 +194,8 @@ export default function App() {
           <>
             <Legend mode={mode === 'sbVsBb' ? (sbVsBbScenario === 'sbOpen' ? 'open' : 'bbDefense') : mode} />
 
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1 min-w-0">
+            <div className="flex flex-col lg:flex-row gap-5 justify-center">
+              <div className="flex-1 min-w-0 max-w-[800px]">
                 <HandMatrix
                   range={range}
                   onSelectHand={setSelectedHand}
