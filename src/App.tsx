@@ -194,8 +194,8 @@ export default function App() {
           <>
             <Legend mode={mode === 'sbVsBb' ? (sbVsBbScenario === 'sbOpen' ? 'open' : 'bbDefense') : mode} />
 
-            <div className="flex w-full flex-col gap-5 lg:flex-row">
-              <div className="flex-1 min-w-0">
+            <div className="flex flex-col items-center gap-5 lg:flex-row lg:items-start lg:justify-center">
+              <div className="w-full max-w-[640px]">
                 <HandMatrix
                   range={range}
                   onSelectHand={setSelectedHand}
@@ -204,7 +204,7 @@ export default function App() {
                   safeMode={safeMode}
                 />
               </div>
-              <div className="lg:w-80 shrink-0 space-y-3">
+              <div className="w-full max-w-[640px] lg:w-80 lg:max-w-none shrink-0 space-y-3">
                 <HandDetail hand={selectedHand} entry={selectedEntry} safeMode={safeMode} />
                 <ExportControls range={range} scenarioLabel={scenarioLabel} />
                 <HandLookup position={myPosition} />
