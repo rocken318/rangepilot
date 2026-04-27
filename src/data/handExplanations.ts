@@ -309,7 +309,7 @@ function buildPositionNote(position: string, _strength: HandStrength): string {
 }
 
 function buildBeginnerWarning(
-  hand: string,
+  _hand: string,
   h: ParsedHand,
   action: string,
   strength: HandStrength
