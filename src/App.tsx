@@ -10,7 +10,6 @@ import HandMatrix from './components/HandMatrix';
 import Legend from './components/Legend';
 import HandDetail from './components/HandDetail';
 import ExportControls from './components/ExportControls';
-import HandLookup from './components/HandLookup';
 import VillainTypeView from './components/VillainTypeView';
 import MemoView from './components/MemoView';
 import SpotTestView from './components/SpotTestView';
@@ -261,7 +260,6 @@ export default function App() {
               <div className="w-full max-w-[640px] lg:w-80 lg:max-w-none shrink-0 space-y-3">
                 <HandDetail hand={selectedHand} entry={selectedEntry} safeMode={safeMode} mode={mode} position={myPosition} />
                 <ExportControls range={range} scenarioLabel={scenarioLabel} />
-                <HandLookup position={myPosition} />
               </div>
             </div>
           </>
