@@ -9,7 +9,10 @@ export type Mode =
   | 'villainType'
   | 'memo'
   | 'spotTest'
-  | 'positionGuide';
+  | 'positionGuide'
+  | 'postflopGuide'
+  | 'glossary'
+  | 'learningTracker';
 
 export type RangeWidth = 'ultraTight' | 'tight' | 'standard' | 'loose' | 'ultraLoose';
 
@@ -51,6 +54,9 @@ export const MODE_LABELS: Record<Mode, string> = {
   memo: 'メモ',
   spotTest: 'スポットテスト',
   positionGuide: 'ポジション別ガイド',
+  postflopGuide: 'ポストフロップ基礎',
+  glossary: '用語集',
+  learningTracker: '学習トラッカー',
 };
 
 export const RANGE_WIDTH_LABELS: Record<RangeWidth, string> = {

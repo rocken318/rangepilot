@@ -6,6 +6,7 @@ import {
   getOpenRange, getVsOpenRange, getVs3BetRange,
   getBBDefenseRange, getSBvsBBRange,
 } from '../data/ranges';
+import { loadStats, recordAttempt } from '../data/learningTracker';
 
 interface Props {
   safeMode: boolean;
@@ -55,43 +56,62 @@ export default function SpotTestView({ safeMode }: Props) {
   const [resultKind, setResultKind] = useState<ResultKind | null>(null);
   const [answerEntry, setAnswerEntry] = useState<HandEntry | null>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [streak, setStreak] = useState(() => loadStats().streaks);
+  const [weakOnly, setWeakOnly] = useState(false);
 
   const handleChoice = useCallback((choice: UserChoice) => {
-    if (selectedChoice !== null) return; // Already answered
+    if (selectedChoice !== null) return;
 
     const entry = lookupAnswer(currentQuestion);
     setAnswerEntry(entry);
     setSelectedChoice(choice);
 
+    let kind: ResultKind;
     if (!entry || entry.action === 'fold') {
-      // If range says fold or no entry
-      const kind = choice === 'fold' ? 'correct' : 'incorrect';
-      setResultKind(kind);
-      setScore(s => ({
-        correct: s.correct + (kind === 'correct' ? 1 : 0),
-        total: s.total + 1,
-      }));
+      kind = choice === 'fold' ? 'correct' : 'incorrect';
     } else if (isMixedAction(entry.action)) {
-      // Mixed: any answer is acceptable
-      setResultKind('acceptable');
-      setScore(s => ({ correct: s.correct + 1, total: s.total + 1 }));
+      kind = 'acceptable';
     } else {
-      const isCorrect = choiceMatchesAction(choice, entry.action);
-      const kind: ResultKind = isCorrect ? 'correct' : 'incorrect';
-      setResultKind(kind);
-      setScore(s => ({
-        correct: s.correct + (isCorrect ? 1 : 0),
-        total: s.total + 1,
-      }));
+      kind = choiceMatchesAction(choice, entry.action) ? 'correct' : 'incorrect';
     }
+
+    setResultKind(kind);
+    setScore(s => ({
+      correct: s.correct + (kind !== 'incorrect' ? 1 : 0),
+      total: s.total + 1,
+    }));
+
+    // Record to learning tracker
+    const updated = recordAttempt({
+      spotId: currentQuestion.id,
+      userChoice: choice,
+      correctAction: entry?.action ?? 'fold',
+      result: kind,
+      timestamp: Date.now(),
+      position: currentQuestion.myPosition,
+      scenario: currentQuestion.scenario,
+      tags: currentQuestion.tags,
+    });
+    setStreak(updated.streaks);
   }, [selectedChoice, currentQuestion]);
 
   const handleNext = useCallback(() => {
-    setCurrentQuestion(pickRandom(SPOTS));
+    if (weakOnly) {
+      const stats = loadStats();
+      const weakSpotIds = new Set(
+        stats.attempts
+          .filter(a => a.result === 'incorrect')
+          .map(a => a.spotId)
+      );
+      const weakSpots = SPOTS.filter(s => weakSpotIds.has(s.id));
+      setCurrentQuestion(weakSpots.length > 0 ? pickRandom(weakSpots) : pickRandom(SPOTS));
+    } else {
+      setCurrentQuestion(pickRandom(SPOTS));
+    }
     setSelectedChoice(null);
     setResultKind(null);
     setAnswerEntry(null);
-  }, []);
+  }, [weakOnly]);
 
   const resultConfig = useMemo(() => {
     if (!resultKind) return null;
@@ -144,6 +164,28 @@ export default function SpotTestView({ safeMode }: Props) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Streak + weak-only toggle */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-gray-400">
+            連続正解: <span className="text-emerald-400 font-bold">{streak.current}</span>
+          </span>
+          <span className="text-gray-500">
+            最高: <span className="text-yellow-400 font-bold">{streak.best}</span>
+          </span>
+        </div>
+        <button
+          onClick={() => setWeakOnly(w => !w)}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            weakOnly
+              ? 'bg-red-600/20 text-red-400 border border-red-600/40'
+              : 'bg-gray-800 text-gray-500 hover:text-gray-300 border border-gray-700'
+          }`}
+        >
+          {weakOnly ? '苦手モード ON' : '苦手モード'}
+        </button>
       </div>
 
       {/* Question card */}

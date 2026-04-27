@@ -15,6 +15,9 @@ import VillainTypeView from './components/VillainTypeView';
 import MemoView from './components/MemoView';
 import SpotTestView from './components/SpotTestView';
 import PositionGuideView from './components/PositionGuideView';
+import PostflopGuideView from './components/PostflopGuideView';
+import GlossaryView from './components/GlossaryView';
+import LearningTrackerView from './components/LearningTrackerView';
 import Assumptions from './components/Assumptions';
 
 export default function App() {
@@ -27,7 +30,7 @@ export default function App() {
   const [sbVsBbScenario, setSbVsBbScenario] = useState<'sbOpen' | 'bbDefVsSb'>('sbOpen');
   const [safeMode, setSafeMode] = useState(false);
 
-  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'positionGuide'];
+  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker'];
 
   function getAvailableScenarios(pos: Position): { mode: Mode; sbScenario?: 'sbOpen' | 'bbDefVsSb' }[] {
     switch (pos) {
@@ -161,7 +164,7 @@ export default function App() {
   }, [range]);
 
   const selectedEntry = selectedHand ? range[selectedHand] || null : null;
-  const showMatrix = !['villainType', 'memo', 'spotTest', 'positionGuide'].includes(mode);
+  const showMatrix = !UTILITY_MODES.includes(mode);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f1117] to-[#111827] text-gray-200">
@@ -235,6 +238,9 @@ export default function App() {
             }}
           />
         )}
+        {mode === 'postflopGuide' && <PostflopGuideView />}
+        {mode === 'glossary' && <GlossaryView />}
+        {mode === 'learningTracker' && <LearningTrackerView />}
 
         {showMatrix && (
           <>
@@ -251,7 +257,7 @@ export default function App() {
                 />
               </div>
               <div className="w-full max-w-[640px] lg:w-80 lg:max-w-none shrink-0 space-y-3">
-                <HandDetail hand={selectedHand} entry={selectedEntry} safeMode={safeMode} />
+                <HandDetail hand={selectedHand} entry={selectedEntry} safeMode={safeMode} mode={mode} position={myPosition} />
                 <ExportControls range={range} scenarioLabel={scenarioLabel} />
                 <HandLookup position={myPosition} />
               </div>
