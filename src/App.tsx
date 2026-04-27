@@ -18,6 +18,7 @@ import PositionGuideView from './components/PositionGuideView';
 import PostflopGuideView from './components/PostflopGuideView';
 import GlossaryView from './components/GlossaryView';
 import LearningTrackerView from './components/LearningTrackerView';
+import AIReviewView from './components/AIReviewView';
 import Assumptions from './components/Assumptions';
 
 export default function App() {
@@ -30,7 +31,7 @@ export default function App() {
   const [sbVsBbScenario, setSbVsBbScenario] = useState<'sbOpen' | 'bbDefVsSb'>('sbOpen');
   const [safeMode, setSafeMode] = useState(false);
 
-  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker'];
+  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview'];
 
   function getAvailableScenarios(pos: Position): { mode: Mode; sbScenario?: 'sbOpen' | 'bbDefVsSb' }[] {
     switch (pos) {
@@ -241,6 +242,7 @@ export default function App() {
         {mode === 'postflopGuide' && <PostflopGuideView />}
         {mode === 'glossary' && <GlossaryView />}
         {mode === 'learningTracker' && <LearningTrackerView />}
+        {mode === 'aiReview' && <AIReviewView />}
 
         {showMatrix && (
           <>

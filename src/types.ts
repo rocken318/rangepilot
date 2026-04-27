@@ -12,7 +12,8 @@ export type Mode =
   | 'positionGuide'
   | 'postflopGuide'
   | 'glossary'
-  | 'learningTracker';
+  | 'learningTracker'
+  | 'aiReview';
 
 export type RangeWidth = 'ultraTight' | 'tight' | 'standard' | 'loose' | 'ultraLoose';
 
@@ -57,6 +58,7 @@ export const MODE_LABELS: Record<Mode, string> = {
   postflopGuide: 'ポストフロップ基礎',
   glossary: '用語集',
   learningTracker: '学習トラッカー',
+  aiReview: 'AIレビュー',
 };
 
 export const RANGE_WIDTH_LABELS: Record<RangeWidth, string> = {
