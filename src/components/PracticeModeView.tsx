@@ -260,8 +260,8 @@ export default function PracticeModeView({ safeMode }: Props) {
             style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(30,120,50,0.18) 0%, transparent 65%)' }}
           />
 
-        {/* Seat badges — CoinPoker avatar style */}
-        {ALL_POSITIONS.map(pos => {
+          {/* Seat badges — CoinPoker avatar style */}
+          {ALL_POSITIONS.map(pos => {
           const isHero = pos === currentQuestion.myPosition;
           const isOpener = pos === currentQuestion.openerPosition;
           const isDealer = pos === 'BTN';
@@ -340,8 +340,8 @@ export default function PracticeModeView({ safeMode }: Props) {
           );
         })}
 
-        {/* Center: pot + cards + situation */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4">
+          {/* Center: pot + cards + situation */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4">
           {/* Pot display */}
           <div
             className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white/80"
@@ -367,7 +367,7 @@ export default function PracticeModeView({ safeMode }: Props) {
               <p className="text-[10px] mt-0.5" style={{ color: 'rgba(134,239,172,0.5)' }}>どうする？</p>
             )}
           </div>
-        </div>
+          </div>
         </div>{/* end inner felt */}
       </div>{/* end leather border wrapper */}
 
