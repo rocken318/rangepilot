@@ -17,14 +17,43 @@ interface Props {
 
 const ALL_POSITIONS = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'] as const;
 
-// Hardcoded elliptical seat positions (percentage-based within table container)
+// Seat positions — percentage-based within the table container
 const SEAT_POSITIONS: Record<string, CSSProperties> = {
-  UTG: { top: '6%',    left: '15%'  },
-  HJ:  { top: '6%',    right: '15%' },
-  CO:  { top: '44%',   right: '1%'  },
-  BTN: { bottom: '6%', right: '15%' },
-  SB:  { bottom: '6%', left: '15%'  },
-  BB:  { top: '44%',   left: '1%'   },
+  UTG: { top: '4%',    left: '12%'  },
+  HJ:  { top: '4%',    right: '12%' },
+  CO:  { top: '38%',   right: '-2%' },
+  BTN: { bottom: '4%', right: '12%' },
+  SB:  { bottom: '4%', left: '12%'  },
+  BB:  { top: '38%',   left: '-2%'  },
+};
+
+// Avatar ring color per seat
+const SEAT_COLORS: Record<string, string> = {
+  UTG: '#3b82f6',
+  HJ:  '#8b5cf6',
+  CO:  '#f97316',
+  BTN: '#ef4444',
+  SB:  '#eab308',
+  BB:  '#14b8a6',
+};
+
+// Action badge appearance
+type ActionBadgeKind = 'RAISE' | '3-BET' | '4-BET' | 'CALL' | 'FOLD';
+const ACTION_BADGE_STYLE: Record<ActionBadgeKind, string> = {
+  'RAISE': 'bg-orange-500/90 text-white',
+  '3-BET': 'bg-rose-600/90 text-white',
+  '4-BET': 'bg-purple-600/90 text-white',
+  'CALL':  'bg-sky-500/90 text-white',
+  'FOLD':  'bg-gray-600/70 text-gray-300',
+};
+
+// Map UserChoice → ActionBadgeKind
+const CHOICE_TO_BADGE: Record<string, ActionBadgeKind> = {
+  raise: 'RAISE',
+  call:  'CALL',
+  '3bet': '3-BET',
+  '4bet': '4-BET',
+  fold:  'FOLD',
 };
 
 type ResultKind = 'correct' | 'incorrect' | 'acceptable';
