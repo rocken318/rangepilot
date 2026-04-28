@@ -18,6 +18,8 @@ import PostflopGuideView from './components/PostflopGuideView';
 import GlossaryView from './components/GlossaryView';
 import LearningTrackerView from './components/LearningTrackerView';
 import AIReviewView from './components/AIReviewView';
+import PracticeModeView from './components/PracticeModeView';
+import HandHistoryAnalyzer from './components/HandHistoryAnalyzer';
 import Assumptions from './components/Assumptions';
 
 export default function App() {
@@ -30,7 +32,7 @@ export default function App() {
   const [sbVsBbScenario, setSbVsBbScenario] = useState<'sbOpen' | 'bbDefVsSb'>('sbOpen');
   const [safeMode, setSafeMode] = useState(false);
 
-  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview'];
+  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'practiceMode', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview', 'handHistoryAnalyzer'];
 
   function getAvailableScenarios(pos: Position): { mode: Mode; sbScenario?: 'sbOpen' | 'bbDefVsSb' }[] {
     switch (pos) {
@@ -242,6 +244,8 @@ export default function App() {
         {mode === 'glossary' && <GlossaryView />}
         {mode === 'learningTracker' && <LearningTrackerView />}
         {mode === 'aiReview' && <AIReviewView />}
+        {mode === 'practiceMode' && <PracticeModeView safeMode={safeMode} />}
+        {mode === 'handHistoryAnalyzer' && <HandHistoryAnalyzer safeMode={safeMode} />}
 
         {showMatrix && (
           <>

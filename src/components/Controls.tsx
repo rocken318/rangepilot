@@ -39,7 +39,7 @@ const POSITION_SCENARIOS: Record<Position, ScenarioTab[]> = {
 };
 
 const ALL_POSITIONS: Position[] = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
-const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview'];
+const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'practiceMode', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview', 'handHistoryAnalyzer'];
 const rangeWidths: RangeWidth[] = ['ultraTight', 'tight', 'standard', 'loose', 'ultraLoose'];
 
 function getAvailableOpenerPositions(mode: Mode, myPos: Position): Position[] {
