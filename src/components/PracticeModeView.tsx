@@ -245,30 +245,82 @@ export default function PracticeModeView({ safeMode }: Props) {
           style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(30,120,50,0.18) 0%, transparent 65%)' }}
         />
 
-        {/* Seat badges — absolute positioned around ellipse */}
+        {/* Seat badges — CoinPoker avatar style */}
         {ALL_POSITIONS.map(pos => {
           const isHero = pos === currentQuestion.myPosition;
           const isOpener = pos === currentQuestion.openerPosition;
+          const isDealer = pos === 'BTN';
+
+          // Determine action badge to show
+          let badge: ActionBadgeKind | null = null;
+          if (isOpener && !isHero) {
+            badge = 'RAISE';
+          } else if (!isHero && !isOpener) {
+            badge = 'FOLD';
+          }
+          // After hero answers, show hero's action
+          if (isHero && selectedChoice !== null) {
+            badge = CHOICE_TO_BADGE[selectedChoice] ?? null;
+          }
+
+          // Avatar ring color
+          const ringColor = isHero
+            ? '#4ade80'
+            : isOpener
+            ? '#f97316'
+            : SEAT_COLORS[pos];
+
           return (
             <div
               key={pos}
-              className="absolute flex flex-col items-center"
+              className="absolute flex flex-col items-center gap-0.5"
               style={SEAT_POSITIONS[pos]}
             >
-              <div
-                className="text-xs font-bold px-2.5 py-1 rounded-lg whitespace-nowrap"
-                style={
-                  isHero
-                    ? { background: 'rgba(22,163,74,0.85)', color: '#fff', border: '1.5px solid #4ade80', boxShadow: '0 0 12px rgba(74,222,128,0.4)' }
-                    : isOpener
-                    ? { background: 'rgba(180,80,0,0.75)', color: '#ffd090', border: '1px solid rgba(255,160,64,0.5)' }
-                    : { background: 'rgba(0,0,0,0.55)', color: '#6b7280', border: '1px solid rgba(255,255,255,0.08)' }
-                }
-              >
-                {pos}
-                {isHero && <span className="ml-1 opacity-80">★</span>}
-                {isOpener && !isHero && <span className="ml-1 text-[10px]">↑R</span>}
+              {/* Avatar circle */}
+              <div className="relative">
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center font-black text-sm text-white"
+                  style={{
+                    background: `radial-gradient(circle at 35% 35%, ${SEAT_COLORS[pos]}cc, ${SEAT_COLORS[pos]}66)`,
+                    border: `2px solid ${ringColor}`,
+                    boxShadow: isHero
+                      ? `0 0 12px ${ringColor}88`
+                      : isOpener
+                      ? `0 0 8px ${ringColor}66`
+                      : 'none',
+                  }}
+                >
+                  {pos.slice(0, 2)}
+                </div>
+
+                {/* Position label — top-left corner of avatar */}
+                <div
+                  className="absolute -top-2 -left-1 text-[9px] font-bold px-1 rounded"
+                  style={{ background: 'rgba(0,0,0,0.85)', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.12)' }}
+                >
+                  {pos}
+                </div>
+
+                {/* Dealer button */}
+                {isDealer && (
+                  <div
+                    className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black"
+                    style={{ background: '#fff', color: '#1f2937', border: '1.5px solid #9ca3af' }}
+                  >
+                    D
+                  </div>
+                )}
               </div>
+
+              {/* Stack */}
+              <div className="text-[10px] text-gray-400 font-mono">100BB</div>
+
+              {/* Action badge */}
+              {badge && (
+                <div className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${ACTION_BADGE_STYLE[badge]}`}>
+                  {badge}
+                </div>
+              )}
             </div>
           );
         })}
