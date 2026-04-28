@@ -194,7 +194,10 @@ export default function PracticeModeView({ safeMode }: Props) {
   }, [answerEntry]);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div
+      className="w-full min-h-screen flex flex-col gap-4 px-2 py-4"
+      style={{ background: 'linear-gradient(160deg, #0d1620 0%, #0f1923 60%, #0a1018 100%)' }}
+    >
 
       {/* Casino HUD */}
       <div
@@ -224,26 +227,37 @@ export default function PracticeModeView({ safeMode }: Props) {
         </div>
       </div>
 
-      {/* Green felt poker table */}
+      {/* Green felt poker table — leather border + felt surface */}
       <div
-        className="relative rounded-2xl overflow-hidden"
         style={{
-          background: 'radial-gradient(ellipse at 50% 45%, #1a5c2a 0%, #0f4420 55%, #0a3018 100%)',
-          minHeight: '280px',
-          boxShadow: resultConfig ? resultConfig.tableGlow : 'none',
+          borderRadius: '50% / 42%',
+          background: 'linear-gradient(180deg, #3a2510 0%, #1e1208 100%)',
+          padding: '12px',
+          boxShadow: resultConfig
+            ? `${resultConfig.tableGlow}, 0 8px 40px rgba(0,0,0,0.8)`
+            : '0 8px 40px rgba(0,0,0,0.8)',
           transition: 'box-shadow 0.4s ease',
         }}
       >
-        {/* Felt inner border ring */}
+        {/* Inner felt — relative container for absolute seat badges */}
         <div
-          className="absolute inset-3 rounded-2xl pointer-events-none"
-          style={{ border: '1.5px solid rgba(255,255,255,0.07)' }}
-        />
-        {/* Center ambient glow */}
-        <div
-          className="absolute inset-0 pointer-events-none rounded-2xl"
-          style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(30,120,50,0.18) 0%, transparent 65%)' }}
-        />
+          className="relative"
+          style={{
+            borderRadius: '50% / 42%',
+            background: 'radial-gradient(ellipse at 50% 45%, #1a5c2a 0%, #0f4420 55%, #0a3018 100%)',
+            minHeight: '290px',
+          }}
+        >
+          {/* Felt inner ring */}
+          <div
+            className="absolute inset-3 pointer-events-none"
+            style={{ borderRadius: '50% / 42%', border: '1.5px solid rgba(255,255,255,0.07)' }}
+          />
+          {/* Center ambient glow */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(30,120,50,0.18) 0%, transparent 65%)' }}
+          />
 
         {/* Seat badges — CoinPoker avatar style */}
         {ALL_POSITIONS.map(pos => {
@@ -338,7 +352,8 @@ export default function PracticeModeView({ safeMode }: Props) {
             <p className="text-xs mt-0.5" style={{ color: 'rgba(134,239,172,0.6)' }}>どうする？</p>
           </div>
         </div>
-      </div>
+        </div>{/* end inner felt */}
+      </div>{/* end leather border wrapper */}
 
       {/* Action buttons — casino gradient style */}
       <div className="flex flex-wrap justify-center gap-2">
