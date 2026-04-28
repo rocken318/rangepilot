@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import type { CSSProperties } from 'react';
 import type { HandEntry } from '../types';
 import type { ReviewInput, ReviewResult } from '../types/review';
 import { SPOTS, USER_CHOICE_LABELS, choiceMatchesAction, isMixedAction } from '../data/spots';
@@ -8,6 +9,7 @@ import {
   getBBDefenseRange, getSBvsBBRange,
 } from '../data/ranges';
 import { loadStats, recordAttempt } from '../data/learningTracker';
+import PokerCard, { handToCards } from './PokerCard';
 
 interface Props {
   safeMode: boolean;
@@ -15,7 +17,36 @@ interface Props {
 
 const ALL_POSITIONS = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'] as const;
 
+// Hardcoded elliptical seat positions (percentage-based within table container)
+const SEAT_POSITIONS: Record<string, CSSProperties> = {
+  UTG: { top: '6%',    left: '15%'  },
+  HJ:  { top: '6%',    right: '15%' },
+  CO:  { top: '44%',   right: '1%'  },
+  BTN: { bottom: '6%', right: '15%' },
+  SB:  { bottom: '6%', left: '15%'  },
+  BB:  { top: '44%',   left: '1%'   },
+};
+
 type ResultKind = 'correct' | 'incorrect' | 'acceptable';
+
+const RESULT_CONFIG: Record<ResultKind, {
+  label: string; icon: string;
+  border: string; bg: string; text: string;
+  tableGlow: string;
+}> = {
+  correct:    { label: '正解！',   icon: '✅', border: 'border-green-500',  bg: 'bg-green-900/30',  text: 'text-green-400',  tableGlow: '0 0 40px rgba(74,222,128,0.45)'  },
+  incorrect:  { label: '不正解',   icon: '❌', border: 'border-red-500',    bg: 'bg-red-900/30',    text: 'text-red-400',    tableGlow: '0 0 40px rgba(239,68,68,0.45)'   },
+  acceptable: { label: '許容範囲', icon: '🔶', border: 'border-yellow-500', bg: 'bg-yellow-900/30', text: 'text-yellow-400', tableGlow: '0 0 40px rgba(251,191,36,0.45)'  },
+};
+
+// Casino-style gradient button styles per choice
+const CHOICE_STYLES: Record<UserChoice, string> = {
+  raise: 'bg-gradient-to-b from-amber-400 to-amber-600 border-amber-300/60 text-gray-900 hover:from-amber-300 hover:to-amber-500',
+  call:  'bg-gradient-to-b from-sky-500 to-sky-700 border-sky-400/40 text-white hover:from-sky-400 hover:to-sky-600',
+  '3bet':'bg-gradient-to-b from-rose-600 to-rose-800 border-rose-500/40 text-white hover:from-rose-500 hover:to-rose-700',
+  '4bet':'bg-gradient-to-b from-purple-600 to-purple-800 border-purple-500/40 text-white hover:from-purple-500 hover:to-purple-700',
+  fold:  'bg-gradient-to-b from-gray-600 to-gray-800 border-gray-500/40 text-gray-100 hover:from-gray-500 hover:to-gray-700',
+};
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -24,102 +55,15 @@ function pickRandom<T>(arr: T[]): T {
 function lookupAnswer(q: SpotQuestion): HandEntry | null {
   let range: Record<string, HandEntry>;
   switch (q.lookupMode) {
-    case 'open':
-      range = getOpenRange(q.lookupMyPos, 'standard');
-      break;
-    case 'vsOpen':
-      range = getVsOpenRange(q.lookupMyPos, q.lookupOpenerPos!, 'standard');
-      break;
-    case 'vs3Bet':
-      range = getVs3BetRange(q.lookupMyPos, 'standard');
-      break;
-    case 'bbDefense':
-      range = getBBDefenseRange(q.lookupOpenerPos!, 'standard');
-      break;
-    case 'sbVsBb':
-      range = getSBvsBBRange(q.lookupSbBbScenario!, 'standard');
-      break;
-    default:
-      return null;
+    case 'open':      range = getOpenRange(q.lookupMyPos, 'standard'); break;
+    case 'vsOpen':    range = getVsOpenRange(q.lookupMyPos, q.lookupOpenerPos!, 'standard'); break;
+    case 'vs3Bet':    range = getVs3BetRange(q.lookupMyPos, 'standard'); break;
+    case 'bbDefense': range = getBBDefenseRange(q.lookupOpenerPos!, 'standard'); break;
+    case 'sbVsBb':    range = getSBvsBBRange(q.lookupSbBbScenario!, 'standard'); break;
+    default: return null;
   }
   return range[q.hand] || null;
 }
-
-/** Display a poker hand like "AQo" or "99" as two styled card boxes */
-function HandCards({ hand }: { hand: string }) {
-  const isPair = hand.length === 2;
-  const rank1 = hand[0];
-  const rank2 = hand.length >= 2 ? hand[1] : hand[0];
-  const suited = hand.endsWith('s');
-
-  const cardBase = 'w-14 h-20 sm:w-16 sm:h-24 rounded-xl flex items-center justify-center shadow-lg border-2';
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="flex gap-3 justify-center">
-        <div className={`${cardBase} bg-white border-gray-200`}>
-          <span className="text-3xl sm:text-4xl font-black text-gray-900">{rank1}</span>
-        </div>
-        <div className={`${cardBase} ${suited ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}>
-          <span className={`text-3xl sm:text-4xl font-black ${suited ? 'text-blue-700' : 'text-gray-900'}`}>{rank2}</span>
-        </div>
-      </div>
-      <span className="text-xs text-gray-500 font-medium">
-        {isPair ? 'ペア' : suited ? 'スーテッド' : 'オフスート'}
-      </span>
-    </div>
-  );
-}
-
-/** Position badges row — highlights hero and opener */
-function PositionBadges({ heroPos, openerPos }: { heroPos: string; openerPos?: string }) {
-  return (
-    <div className="flex gap-2 justify-center flex-wrap">
-      {ALL_POSITIONS.map(pos => {
-        const isHero = pos === heroPos;
-        const isOpener = pos === openerPos;
-        return (
-          <div
-            key={pos}
-            className={`relative px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${
-              isHero
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 scale-110'
-                : isOpener
-                ? 'bg-orange-600/80 text-white'
-                : 'bg-gray-700/60 text-gray-500'
-            }`}
-          >
-            {pos}
-            {isHero && (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] bg-emerald-500 text-white px-1 rounded font-bold whitespace-nowrap">
-                You
-              </span>
-            )}
-            {isOpener && !isHero && (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] bg-orange-500 text-white px-1 rounded font-bold whitespace-nowrap">
-                Raise
-              </span>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-const CHOICE_STYLES: Record<UserChoice, string> = {
-  raise: 'bg-red-700 hover:bg-red-600 active:bg-red-800 text-white border-red-600',
-  call: 'bg-blue-700 hover:bg-blue-600 active:bg-blue-800 text-white border-blue-600',
-  '3bet': 'bg-rose-700 hover:bg-rose-600 active:bg-rose-800 text-white border-rose-600',
-  '4bet': 'bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white border-purple-600',
-  fold: 'bg-gray-700 hover:bg-gray-600 active:bg-gray-800 text-gray-100 border-gray-600',
-};
-
-const RESULT_CONFIG: Record<ResultKind, { label: string; icon: string; border: string; bg: string; text: string }> = {
-  correct: { label: '正解！', icon: '✅', border: 'border-green-500', bg: 'bg-green-900/30', text: 'text-green-400' },
-  incorrect: { label: '不正解', icon: '❌', border: 'border-red-500', bg: 'bg-red-900/30', text: 'text-red-400' },
-  acceptable: { label: '許容範囲', icon: '🔶', border: 'border-yellow-500', bg: 'bg-yellow-900/30', text: 'text-yellow-400' },
-};
 
 export default function PracticeModeView({ safeMode }: Props) {
   const [currentQuestion, setCurrentQuestion] = useState<SpotQuestion>(() => pickRandom(SPOTS));
@@ -135,7 +79,6 @@ export default function PracticeModeView({ safeMode }: Props) {
 
   const handleChoice = useCallback((choice: UserChoice) => {
     if (selectedChoice !== null) return;
-
     const entry = lookupAnswer(currentQuestion);
     setAnswerEntry(entry);
     setSelectedChoice(choice);
@@ -150,10 +93,8 @@ export default function PracticeModeView({ safeMode }: Props) {
     } else {
       kind = choiceMatchesAction(choice, entry.action) ? 'correct' : 'incorrect';
     }
-
     setResultKind(kind);
     setScore(s => ({ correct: s.correct + (kind !== 'incorrect' ? 1 : 0), total: s.total + 1 }));
-
     const updated = recordAttempt({
       spotId: currentQuestion.id,
       userChoice: choice,
@@ -186,29 +127,21 @@ export default function PracticeModeView({ safeMode }: Props) {
       blinds: '0.5/1.0 (100BB)',
       effectiveStack: '100BB',
       preflopAction: currentQuestion.situationLabel,
-      flopAction: '',
-      turnAction: '',
-      riverAction: '',
-      opponent: {
-        name: '', vpip: '', pfr: '', threeBet: '', foldToThreeBet: '',
-        cbet: '', foldToCbet: '', steal: '', checkRaise: '', wtsd: '', wsd: '',
-      },
+      flopAction: '', turnAction: '', riverAction: '',
+      opponent: { name:'', vpip:'', pfr:'', threeBet:'', foldToThreeBet:'', cbet:'', foldToCbet:'', steal:'', checkRaise:'', wtsd:'', wsd:'' },
       heroDecision: selectedChoice ?? '',
       result: '',
       memo: '練習モードからの質問です。プリフロップの判断のみ簡潔に解説してください。',
     };
     try {
       const res = await fetch('/api/analyze-hand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(errData.error || `HTTP ${res.status}`);
       }
-      const data: ReviewResult = await res.json();
-      setAiResult(data);
+      setAiResult(await res.json());
     } catch (err) {
       setAiError(err instanceof Error ? err.message : 'AI解説の取得に失敗しました');
     } finally {
@@ -218,92 +151,144 @@ export default function PracticeModeView({ safeMode }: Props) {
 
   const resultConfig = resultKind ? RESULT_CONFIG[resultKind] : null;
   const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+  const [card1, card2] = handToCards(currentQuestion.hand);
 
   const actionLabel = useMemo(() => {
     if (!answerEntry) return 'フォールド';
     const map: Record<string, string> = {
       raise: 'オープンレイズ', call: 'コール', fold: 'フォールド',
       '3betValue': '3ベット（バリュー）', '3betBluff': '3ベット（ブラフ）',
-      '3bet': '3ベット', mixed: '状況次第（レイズ or フォールド）',
+      '3bet': '3ベット', mixed: '状況次第',
       '4betValue': '4ベット（バリュー）', '4betBluff': '4ベット（ブラフ）',
     };
     return map[answerEntry.action] ?? answerEntry.action;
   }, [answerEntry]);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
-      {/* Score header */}
-      <div className="flex items-center justify-between bg-gray-800/60 rounded-xl px-4 py-3 border border-gray-700/50">
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-gray-400">
-            スコア: <span className="text-white font-bold">{score.correct}/{score.total}</span>
+    <div className="max-w-2xl mx-auto space-y-4">
+
+      {/* Casino HUD */}
+      <div
+        className="flex items-center justify-between px-4 py-2.5 rounded-xl border"
+        style={{ background: 'rgba(10,12,10,0.9)', borderColor: 'rgba(212,175,55,0.3)' }}
+      >
+        <div className="flex items-center gap-4">
+          <span style={{ color: '#ffd700', fontFamily: 'monospace' }} className="text-sm font-bold">
+            🃏 {score.correct}<span style={{ color: '#4b5563' }}>/{score.total}</span>
           </span>
           {score.total > 0 && (
-            <span className="text-gray-400">
-              正解率: <span className="text-white font-bold">{accuracy}%</span>
+            <span className="text-xs text-gray-400">
+              正解率 <span style={{ color: '#ffd700' }} className="font-bold">{accuracy}%</span>
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-2">
           {streak > 1 && (
-            <span className="bg-orange-600/30 border border-orange-600/40 rounded-lg px-2 py-1 text-orange-300 font-bold">
+            <span
+              className="text-xs font-bold px-2.5 py-1 rounded-lg"
+              style={{ background: 'rgba(212,100,0,0.25)', border: '1px solid rgba(212,100,0,0.5)', color: '#ffa040' }}
+            >
               🔥 {streak}連続
             </span>
           )}
-          <span className="text-gray-500 text-xs">Q.{questionCount}</span>
+          <span className="text-xs text-gray-600">Q.{questionCount}</span>
         </div>
       </div>
 
-      {/* Question card */}
-      <div className="bg-gray-800/40 rounded-2xl p-5 border border-gray-700/50 space-y-5">
-        {/* Position badges */}
-        <PositionBadges
-          heroPos={currentQuestion.myPosition}
-          openerPos={currentQuestion.openerPosition}
+      {/* Green felt poker table */}
+      <div
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 45%, #1a5c2a 0%, #0f4420 55%, #0a3018 100%)',
+          minHeight: '280px',
+          boxShadow: resultConfig ? resultConfig.tableGlow : 'none',
+          transition: 'box-shadow 0.4s ease',
+        }}
+      >
+        {/* Felt inner border ring */}
+        <div
+          className="absolute inset-3 rounded-2xl pointer-events-none"
+          style={{ border: '1.5px solid rgba(255,255,255,0.07)' }}
+        />
+        {/* Center ambient glow */}
+        <div
+          className="absolute inset-0 pointer-events-none rounded-2xl"
+          style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(30,120,50,0.18) 0%, transparent 65%)' }}
         />
 
-        {/* Hand cards */}
-        <div className="flex justify-center py-2">
-          <HandCards hand={currentQuestion.hand} />
-        </div>
-
-        {/* Situation text */}
-        <div className="text-center">
-          <p className="text-base sm:text-lg text-gray-200 font-medium">{currentQuestion.situationLabel}</p>
-          <p className="text-sm text-gray-400 mt-1">どうする？</p>
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {currentQuestion.choices.map(choice => {
-            const isSelected = selectedChoice === choice;
-            const isDisabled = selectedChoice !== null;
-            const isCorrectAnswer = answerEntry && choiceMatchesAction(choice, answerEntry.action);
-
-            let extraClass = '';
-            if (selectedChoice !== null) {
-              if (isSelected && resultKind === 'correct') extraClass = 'ring-2 ring-green-400 scale-105';
-              else if (isSelected && resultKind === 'incorrect') extraClass = 'ring-2 ring-red-400 opacity-80';
-              else if (isSelected && resultKind === 'acceptable') extraClass = 'ring-2 ring-yellow-400';
-              else if (isCorrectAnswer && !isSelected) extraClass = 'ring-2 ring-green-500 opacity-90';
-              else extraClass = 'opacity-40';
-            }
-
-            return (
-              <button
-                key={choice}
-                onClick={() => handleChoice(choice)}
-                disabled={isDisabled}
-                className={`px-5 py-3 rounded-xl text-sm sm:text-base font-bold border transition-all min-h-[48px] min-w-[80px] ${CHOICE_STYLES[choice]} ${extraClass} disabled:cursor-not-allowed`}
+        {/* Seat badges — absolute positioned around ellipse */}
+        {ALL_POSITIONS.map(pos => {
+          const isHero = pos === currentQuestion.myPosition;
+          const isOpener = pos === currentQuestion.openerPosition;
+          return (
+            <div
+              key={pos}
+              className="absolute flex flex-col items-center"
+              style={SEAT_POSITIONS[pos]}
+            >
+              <div
+                className="text-xs font-bold px-2.5 py-1 rounded-lg whitespace-nowrap"
+                style={
+                  isHero
+                    ? { background: 'rgba(22,163,74,0.85)', color: '#fff', border: '1.5px solid #4ade80', boxShadow: '0 0 12px rgba(74,222,128,0.4)' }
+                    : isOpener
+                    ? { background: 'rgba(180,80,0,0.75)', color: '#ffd090', border: '1px solid rgba(255,160,64,0.5)' }
+                    : { background: 'rgba(0,0,0,0.55)', color: '#6b7280', border: '1px solid rgba(255,255,255,0.08)' }
+                }
               >
-                {USER_CHOICE_LABELS[choice]}
-              </button>
-            );
-          })}
+                {pos}
+                {isHero && <span className="ml-1 opacity-80">★</span>}
+                {isOpener && !isHero && <span className="ml-1 text-[10px]">↑R</span>}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Center: cards + situation */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4">
+          <div className="flex gap-3">
+            <PokerCard rank={card1.rank} suit={card1.suit} size="lg" />
+            <PokerCard rank={card2.rank} suit={card2.suit} size="lg" />
+          </div>
+          <div className="text-center">
+            <p className="text-sm sm:text-base font-semibold text-white/90 drop-shadow-lg">
+              {currentQuestion.situationLabel}
+            </p>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(134,239,172,0.6)' }}>どうする？</p>
+          </div>
         </div>
       </div>
 
-      {/* Result + Explanation */}
+      {/* Action buttons — casino gradient style */}
+      <div className="flex flex-wrap justify-center gap-2">
+        {currentQuestion.choices.map(choice => {
+          const isSelected = selectedChoice === choice;
+          const isDisabled = selectedChoice !== null;
+          const isCorrectAnswer = answerEntry && choiceMatchesAction(choice, answerEntry.action);
+
+          let extraClass = '';
+          if (selectedChoice !== null) {
+            if (isSelected && resultKind === 'correct')         extraClass = 'ring-2 ring-green-400 scale-105';
+            else if (isSelected && resultKind === 'incorrect')  extraClass = 'ring-2 ring-red-400 opacity-80';
+            else if (isSelected && resultKind === 'acceptable') extraClass = 'ring-2 ring-yellow-400';
+            else if (isCorrectAnswer && !isSelected)            extraClass = 'ring-2 ring-green-500';
+            else                                                extraClass = 'opacity-35';
+          }
+
+          return (
+            <button
+              key={choice}
+              onClick={() => handleChoice(choice)}
+              disabled={isDisabled}
+              className={`px-5 py-3 rounded-xl text-sm sm:text-base font-bold border transition-all active:scale-[0.97] min-h-[48px] min-w-[80px] ${CHOICE_STYLES[choice]} ${extraClass} disabled:cursor-not-allowed`}
+            >
+              {USER_CHOICE_LABELS[choice]}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Result + explanation panel */}
       {resultConfig && (
         <div className={`rounded-xl border-2 ${resultConfig.border} ${resultConfig.bg} p-5 space-y-4`}>
           <div className="flex items-center gap-2 flex-wrap">
@@ -316,22 +301,19 @@ export default function PracticeModeView({ safeMode }: Props) {
             )}
           </div>
 
-          {/* Static explanation */}
-          <div className="space-y-2 text-sm text-gray-300 leading-relaxed">
+          <div className="text-sm text-gray-300 leading-relaxed space-y-1">
             <p>{currentQuestion.explanation}</p>
             {currentQuestion.beginnerTip && (
               <p className="text-xs text-gray-400 italic">{currentQuestion.beginnerTip}</p>
             )}
           </div>
 
-          {/* SafeMode explanation */}
           {safeMode && currentQuestion.safeExplanation && (
             <div className="bg-green-900/30 border border-green-700/40 rounded-lg px-3 py-2 text-sm text-green-300">
               🛡 安全寄り: {currentQuestion.safeExplanation}
             </div>
           )}
 
-          {/* AI explanation */}
           {!aiResult && (
             <button
               onClick={handleAskAI}
@@ -341,25 +323,23 @@ export default function PracticeModeView({ safeMode }: Props) {
               {aiLoading ? '🤖 AI解説を取得中...' : '🤖 AIにもっと詳しく聞く'}
             </button>
           )}
-          {aiError && (
-            <p className="text-xs text-red-400">⚠ {aiError}</p>
-          )}
+          {aiError && <p className="text-xs text-red-400">⚠ {aiError}</p>}
           {aiResult && (
             <div className="bg-indigo-900/30 border border-indigo-700/40 rounded-lg px-4 py-3 space-y-2">
               <p className="text-xs text-indigo-400 font-semibold">🤖 AI解説</p>
               <p className="text-sm text-gray-300 leading-relaxed">{aiResult.summary}</p>
               {aiResult.nextRules.length > 0 && (
-                <ul className="text-xs text-gray-400 space-y-1 mt-2">
+                <ul className="text-xs text-gray-400 space-y-1 mt-1">
                   {aiResult.nextRules.map((r, i) => <li key={i}>• {r}</li>)}
                 </ul>
               )}
             </div>
           )}
 
-          {/* Next button */}
           <button
             onClick={handleNext}
-            className="w-full py-3 rounded-xl text-sm font-bold bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+            className="w-full py-3 rounded-xl text-sm font-bold text-white transition-colors"
+            style={{ background: 'linear-gradient(180deg, #374151 0%, #1f2937 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
           >
             次の問題 →
           </button>
