@@ -127,7 +127,7 @@ export default function PracticeModeView({ safeMode }: Props) {
   const [resultKind, setResultKind] = useState<ResultKind | null>(null);
   const [answerEntry, setAnswerEntry] = useState<HandEntry | null>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [streak, setStreak] = useState(() => loadStats().streaks);
+  const [streak, setStreak] = useState(() => loadStats().streaks.current);
   const [aiResult, setAiResult] = useState<ReviewResult | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -164,7 +164,7 @@ export default function PracticeModeView({ safeMode }: Props) {
       scenario: currentQuestion.scenario,
       tags: currentQuestion.tags,
     });
-    setStreak(updated.streaks);
+    setStreak(updated.streaks.current);
   }, [selectedChoice, currentQuestion]);
 
   const handleNext = useCallback(() => {
