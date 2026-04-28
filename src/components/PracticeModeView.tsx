@@ -339,17 +339,32 @@ export default function PracticeModeView({ safeMode }: Props) {
           );
         })}
 
-        {/* Center: cards + situation */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4">
-          <div className="flex gap-3">
+        {/* Center: pot + cards + situation */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4">
+          {/* Pot display */}
+          <div
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white/80"
+            style={{ background: 'rgba(0,0,0,0.45)', border: '1px solid rgba(255,255,255,0.12)' }}
+          >
+            <span style={{ color: '#a3e635' }}>●</span>
+            <span>ポット</span>
+            <span className="font-bold text-white">2.5BB</span>
+          </div>
+
+          {/* Hero hole cards */}
+          <div className="flex gap-2">
             <PokerCard rank={card1.rank} suit={card1.suit} size="lg" />
             <PokerCard rank={card2.rank} suit={card2.suit} size="lg" />
           </div>
+
+          {/* Situation label */}
           <div className="text-center">
-            <p className="text-sm sm:text-base font-semibold text-white/90 drop-shadow-lg">
+            <p className="text-xs sm:text-sm font-semibold text-white/80 drop-shadow-lg leading-snug">
               {currentQuestion.situationLabel}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(134,239,172,0.6)' }}>どうする？</p>
+            {selectedChoice === null && (
+              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(134,239,172,0.5)' }}>どうする？</p>
+            )}
           </div>
         </div>
         </div>{/* end inner felt */}
