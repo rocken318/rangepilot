@@ -195,9 +195,10 @@ export default function PracticeModeView({ safeMode }: Props) {
 
   return (
     <div
-      className="w-full min-h-screen flex flex-col gap-4 px-2 py-4"
+      className="w-full min-h-screen flex flex-col items-center px-2 py-4"
       style={{ background: 'linear-gradient(160deg, #0d1620 0%, #0f1923 60%, #0a1018 100%)' }}
     >
+      <div className="w-full max-w-2xl flex flex-col gap-4">
 
       {/* Casino HUD */}
       <div
@@ -371,7 +372,10 @@ export default function PracticeModeView({ safeMode }: Props) {
       </div>{/* end leather border wrapper */}
 
       {/* Action buttons — casino gradient style */}
-      <div className="flex flex-wrap justify-center gap-2">
+      <div
+        className="flex flex-wrap justify-center gap-3 px-2 py-3 rounded-xl"
+        style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}
+      >
         {currentQuestion.choices.map(choice => {
           const isSelected = selectedChoice === choice;
           const isDisabled = selectedChoice !== null;
@@ -456,6 +460,7 @@ export default function PracticeModeView({ safeMode }: Props) {
           </button>
         </div>
       )}
+      </div>{/* end max-w-2xl */}
     </div>
   );
 }
