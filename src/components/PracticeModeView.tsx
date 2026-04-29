@@ -300,7 +300,11 @@ export default function PracticeModeView({ safeMode }: Props) {
               // vsOpen/open: only players before hero in action order have folded
             if (hasFolded) badge = 'FOLD';
           }
-          // After hero answers, show hero's action
+          // In vs3Bet, hero originally raised — show that before answer is given
+          if (isHero && scenario === 'vs3Bet' && selectedChoice === null) {
+            badge = 'RAISE';
+          }
+          // After hero answers, show hero's response action
           if (isHero && selectedChoice !== null) {
             badge = CHOICE_TO_BADGE[selectedChoice] ?? null;
           }
