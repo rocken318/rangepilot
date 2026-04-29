@@ -77,6 +77,8 @@ const CHOICE_STYLES: Record<UserChoice, string> = {
   '3bet':'bg-gradient-to-b from-rose-600 to-rose-800 border-rose-500/40 text-white hover:from-rose-500 hover:to-rose-700',
   '4bet':'bg-gradient-to-b from-purple-600 to-purple-800 border-purple-500/40 text-white hover:from-purple-500 hover:to-purple-700',
   fold:  'bg-gradient-to-b from-gray-600 to-gray-800 border-gray-500/40 text-gray-100 hover:from-gray-500 hover:to-gray-700',
+  bet:   'bg-gradient-to-b from-emerald-500 to-emerald-700 border-emerald-400/40 text-white hover:from-emerald-400 hover:to-emerald-600',
+  check: 'bg-gradient-to-b from-slate-500 to-slate-700 border-slate-400/40 text-gray-100 hover:from-slate-400 hover:to-slate-600',
 };
 
 function pickRandom<T>(arr: T[]): T {
@@ -110,26 +112,36 @@ export default function PracticeModeView({ safeMode }: Props) {
 
   const handleChoice = useCallback((choice: UserChoice) => {
     if (selectedChoice !== null) return;
-    const entry = lookupAnswer(currentQuestion);
-    setAnswerEntry(entry);
+
+    let kind: ResultKind;
+
+    if (currentQuestion.street && currentQuestion.street !== 'preflop') {
+      // Post-flop: use explicit correctAction
+      const correct = currentQuestion.correctAction;
+      kind = choice === correct ? 'correct' : 'incorrect';
+      setAnswerEntry(correct ? { hand: currentQuestion.hand, action: correct as any } : null);
+    } else {
+      // Pre-flop: existing range lookup
+      const entry = lookupAnswer(currentQuestion);
+      setAnswerEntry(entry);
+      if (!entry || entry.action === 'fold') {
+        kind = choice === 'fold' ? 'correct' : 'incorrect';
+      } else if (isMixedAction(entry.action)) {
+        kind = 'acceptable';
+      } else {
+        kind = choiceMatchesAction(choice, entry.action) ? 'correct' : 'incorrect';
+      }
+    }
+
     setSelectedChoice(choice);
     setAiResult(null);
     setAiError(null);
-
-    let kind: ResultKind;
-    if (!entry || entry.action === 'fold') {
-      kind = choice === 'fold' ? 'correct' : 'incorrect';
-    } else if (isMixedAction(entry.action)) {
-      kind = 'acceptable';
-    } else {
-      kind = choiceMatchesAction(choice, entry.action) ? 'correct' : 'incorrect';
-    }
     setResultKind(kind);
     setScore(s => ({ correct: s.correct + (kind !== 'incorrect' ? 1 : 0), total: s.total + 1 }));
     const updated = recordAttempt({
       spotId: currentQuestion.id,
       userChoice: choice,
-      correctAction: entry?.action ?? 'fold',
+      correctAction: currentQuestion.correctAction ?? 'fold',
       result: kind,
       timestamp: Date.now(),
       position: currentQuestion.myPosition,
@@ -192,6 +204,7 @@ export default function PracticeModeView({ safeMode }: Props) {
       '3betValue': '3ベット（バリュー）', '3betBluff': '3ベット（ブラフ）',
       '3bet': '3ベット', mixed: '状況次第',
       '4betValue': '4ベット（バリュー）', '4betBluff': '4ベット（ブラフ）',
+      bet: 'ベット', check: 'チェック',
     };
     return map[answerEntry.action] ?? answerEntry.action;
   }, [answerEntry]);
@@ -353,8 +366,24 @@ export default function PracticeModeView({ safeMode }: Props) {
           >
             <span style={{ color: '#a3e635' }}>●</span>
             <span>ポット</span>
-            <span className="font-bold text-white">2.5BB</span>
+            <span className="font-bold text-white">{currentQuestion.potBB ?? 2.5}BB</span>
           </div>
+
+          {/* Board cards (post-flop) */}
+          {currentQuestion.board && currentQuestion.board.length > 0 && (
+            <div className="flex gap-1.5">
+              {currentQuestion.board.map((card, i) => (
+                <PokerCard key={i} rank={card.rank} suit={card.suit} size="sm" />
+              ))}
+            </div>
+          )}
+
+          {/* Street label */}
+          {currentQuestion.street && currentQuestion.street !== 'preflop' && (
+            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(134,239,172,0.6)' }}>
+              {currentQuestion.street === 'flop' ? 'フロップ' : currentQuestion.street === 'turn' ? 'ターン' : 'リバー'}
+            </div>
+          )}
 
           {/* Hero hole cards */}
           <div className="flex gap-2">
@@ -383,7 +412,9 @@ export default function PracticeModeView({ safeMode }: Props) {
         {currentQuestion.choices.map(choice => {
           const isSelected = selectedChoice === choice;
           const isDisabled = selectedChoice !== null;
-          const isCorrectAnswer = answerEntry && choiceMatchesAction(choice, answerEntry.action);
+          const isCorrectAnswer = currentQuestion.correctAction
+            ? choice === currentQuestion.correctAction
+            : answerEntry && choiceMatchesAction(choice, answerEntry.action);
 
           let extraClass = '';
           if (selectedChoice !== null) {
@@ -413,9 +444,11 @@ export default function PracticeModeView({ safeMode }: Props) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xl">{resultConfig.icon}</span>
             <span className={`text-lg font-bold ${resultConfig.text}`}>{resultConfig.label}</span>
-            {answerEntry && (
+            {(answerEntry || currentQuestion.correctAction) && (
               <span className="ml-auto text-sm text-gray-300">
-                正解: <span className="font-bold text-white">{actionLabel}</span>
+                正解: <span className="font-bold text-white">
+                  {answerEntry ? actionLabel : USER_CHOICE_LABELS[currentQuestion.correctAction!]}
+                </span>
               </span>
             )}
           </div>
