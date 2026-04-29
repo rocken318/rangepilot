@@ -15,17 +15,19 @@ interface Props {
   safeMode: boolean;
 }
 
-const ALL_POSITIONS = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'] as const;
+// Clockwise physical seat order
+const POSITION_ORDER = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'] as const;
 
-// Seat positions — percentage-based within the table container
-const SEAT_POSITIONS: Record<string, CSSProperties> = {
-  UTG: { top: '4%',    left: '12%'  },
-  HJ:  { top: '4%',    right: '12%' },
-  CO:  { top: '38%',   right: '-2%' },
-  BTN: { bottom: '4%', right: '12%' },
-  SB:  { bottom: '4%', left: '12%'  },
-  BB:  { top: '38%',   left: '-2%'  },
-};
+// Fixed display slot positions — slot 0 is ALWAYS the hero (bottom-center)
+// Slots 1-5 go clockwise: bottom-right, right, top-right, top-left, left
+const DISPLAY_SLOT_POSITIONS: CSSProperties[] = [
+  { bottom: '2%',  left: '50%', transform: 'translateX(-50%)' }, // 0 hero
+  { bottom: '8%',  right: '8%'  },                               // 1 bottom-right
+  { top: '38%',    right: '-2%' },                               // 2 right
+  { top: '4%',     right: '12%' },                               // 3 top-right
+  { top: '4%',     left: '12%'  },                               // 4 top-left
+  { top: '38%',    left: '-2%'  },                               // 5 left
+];
 
 // Avatar ring color per seat
 const SEAT_COLORS: Record<string, string> = {
@@ -181,6 +183,7 @@ export default function PracticeModeView({ safeMode }: Props) {
   const resultConfig = resultKind ? RESULT_CONFIG[resultKind] : null;
   const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
   const [card1, card2] = handToCards(currentQuestion.hand);
+  const heroIdx = Math.max(0, POSITION_ORDER.findIndex(p => p === currentQuestion.myPosition));
 
   const actionLabel = useMemo(() => {
     if (!answerEntry) return 'フォールド';
@@ -260,9 +263,10 @@ export default function PracticeModeView({ safeMode }: Props) {
             style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(30,120,50,0.18) 0%, transparent 65%)' }}
           />
 
-          {/* Seat badges — CoinPoker avatar style */}
-          {ALL_POSITIONS.map(pos => {
-          const isHero = pos === currentQuestion.myPosition;
+          {/* Seat badges — hero always at slot 0 (bottom-center), clockwise rotation */}
+          {DISPLAY_SLOT_POSITIONS.map((slotStyle, slotIdx) => {
+          const pos = POSITION_ORDER[(heroIdx + slotIdx) % POSITION_ORDER.length];
+          const isHero = slotIdx === 0;
           const isOpener = pos === currentQuestion.openerPosition;
           const isDealer = pos === 'BTN';
 
@@ -289,7 +293,7 @@ export default function PracticeModeView({ safeMode }: Props) {
             <div
               key={pos}
               className="absolute flex flex-col items-center gap-0.5"
-              style={SEAT_POSITIONS[pos]}
+              style={slotStyle}
             >
               {/* Avatar circle */}
               <div className="relative">
@@ -338,7 +342,7 @@ export default function PracticeModeView({ safeMode }: Props) {
               )}
             </div>
           );
-        })}
+          })}
 
           {/* Center: pot + cards + situation */}
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4">
