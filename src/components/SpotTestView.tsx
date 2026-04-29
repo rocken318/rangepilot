@@ -44,6 +44,8 @@ const CHOICE_BUTTON_COLORS: Record<UserChoice, string> = {
   '3bet': 'bg-red-500 hover:bg-red-400 active:bg-red-600 text-white',
   '4bet': 'bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white',
   fold: 'bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-gray-100',
+  bet: 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white',
+  check: 'bg-slate-600 hover:bg-slate-500 active:bg-slate-700 text-white',
 };
 
 function pickRandom<T>(arr: T[]): T {
