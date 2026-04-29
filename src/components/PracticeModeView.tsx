@@ -285,13 +285,20 @@ export default function PracticeModeView({ safeMode }: Props) {
           const isDealer = pos === 'BTN';
 
           // Determine action badge to show
+          const scenario = currentQuestion.scenario;
           let badge: ActionBadgeKind | null = null;
           if (isOpener && !isHero) {
-            badge = 'RAISE';
-          } else if (!isHero && !isOpener && posIdx < heroIdx) {
-            // Only show FOLD for players who have already acted (posIdx < heroIdx in preflop order)
-            // Players after the hero (e.g. BB when hero=SB) haven't acted yet
-            badge = 'FOLD';
+            // vs3Bet: opponent 3-bet (hero originally raised); others: opponent raised
+            badge = scenario === 'vs3Bet' ? '3-BET' : 'RAISE';
+          } else if (!isHero && !isOpener) {
+            // Determine if this seat has already folded
+            const hasFolded =
+              scenario === 'vs3Bet'     // Everyone else folded (heads-up after 3-bet)
+              || scenario === 'bbDefense' // Everyone else folded (BB is last in preflop)
+              || scenario === 'sbVsBb'    // Everyone else folded (SB vs BB only)
+              || ((scenario === 'vsOpen' || scenario === 'open') && posIdx < heroIdx);
+              // vsOpen/open: only players before hero in action order have folded
+            if (hasFolded) badge = 'FOLD';
           }
           // After hero answers, show hero's action
           if (isHero && selectedChoice !== null) {
