@@ -21,12 +21,12 @@ const POSITION_ORDER = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'] as const;
 // Fixed display slot positions — slot 0 is ALWAYS the hero (bottom-center)
 // Slots 1-5 go clockwise: bottom-right, right, top-right, top-left, left
 const DISPLAY_SLOT_POSITIONS: CSSProperties[] = [
-  { bottom: '2%',  left: '50%', transform: 'translateX(-50%)' }, // 0 hero
+  { bottom: '-4%', left: '50%', transform: 'translateX(-50%)' }, // 0 hero
   { bottom: '8%',  right: '8%'  },                               // 1 bottom-right
-  { top: '38%',    right: '-2%' },                               // 2 right
-  { top: '4%',     right: '12%' },                               // 3 top-right
-  { top: '4%',     left: '12%'  },                               // 4 top-left
-  { top: '38%',    left: '-2%'  },                               // 5 left
+  { top: '38%',    right: '0%'  },                               // 2 right
+  { top: '4%',     right: '10%' },                               // 3 top-right
+  { top: '4%',     left: '10%'  },                               // 4 top-left
+  { top: '38%',    left: '0%'   },                               // 5 left
 ];
 
 // Avatar ring color per seat
@@ -249,7 +249,7 @@ export default function PracticeModeView({ safeMode }: Props) {
           style={{
             borderRadius: '50% / 42%',
             background: 'radial-gradient(ellipse at 50% 45%, #1a5c2a 0%, #0f4420 55%, #0a3018 100%)',
-            minHeight: '290px',
+            minHeight: '340px',
           }}
         >
           {/* Felt inner ring */}
@@ -345,7 +345,7 @@ export default function PracticeModeView({ safeMode }: Props) {
           })}
 
           {/* Center: pot + cards + situation */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 pb-14">
           {/* Pot display */}
           <div
             className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white/80"
