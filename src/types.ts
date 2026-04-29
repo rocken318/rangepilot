@@ -29,7 +29,9 @@ export type Vs3BetAction = '4betValue' | '4betBluff' | 'call' | 'mixed' | 'fold'
 
 export type BbDefenseAction = '3bet' | 'call' | 'mixed' | 'fold';
 
-export type Action = OpenAction | VsOpenAction | Vs3BetAction | BbDefenseAction;
+export type PostflopAction = 'bet' | 'check';
+
+export type Action = OpenAction | VsOpenAction | Vs3BetAction | BbDefenseAction | PostflopAction;
 
 export interface HandEntry {
   hand: string;
