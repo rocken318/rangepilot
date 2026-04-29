@@ -276,9 +276,10 @@ export default function PracticeModeView({ safeMode }: Props) {
             style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(30,120,50,0.18) 0%, transparent 65%)' }}
           />
 
-          {/* Seat badges — hero always at slot 0 (bottom-center), clockwise rotation */}
+          {/* Seat badges — hero always at slot 0 (bottom-center), counter-clockwise on screen = clockwise at table */}
           {DISPLAY_SLOT_POSITIONS.map((slotStyle, slotIdx) => {
-          const pos = POSITION_ORDER[(heroIdx + slotIdx) % POSITION_ORDER.length];
+          const posIdx = (heroIdx - slotIdx + POSITION_ORDER.length) % POSITION_ORDER.length;
+          const pos = POSITION_ORDER[posIdx];
           const isHero = slotIdx === 0;
           const isOpener = pos === currentQuestion.openerPosition;
           const isDealer = pos === 'BTN';
@@ -287,7 +288,9 @@ export default function PracticeModeView({ safeMode }: Props) {
           let badge: ActionBadgeKind | null = null;
           if (isOpener && !isHero) {
             badge = 'RAISE';
-          } else if (!isHero && !isOpener) {
+          } else if (!isHero && !isOpener && posIdx < heroIdx) {
+            // Only show FOLD for players who have already acted (posIdx < heroIdx in preflop order)
+            // Players after the hero (e.g. BB when hero=SB) haven't acted yet
             badge = 'FOLD';
           }
           // After hero answers, show hero's action
