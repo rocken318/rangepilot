@@ -117,7 +117,14 @@ export default function GTOGuideView() {
             {(Object.keys(SCENARIO_LABELS) as ScenarioType[]).map(s => (
               <button
                 key={s}
-                onClick={() => setScenarioType(s)}
+                onClick={() => {
+                  setScenarioType(s);
+                  if (s === 'sbVsBb') { setHeroPos('SB'); setOpenerPos('UTG'); }
+                  else if (s === 'bbDefense') { setOpenerPos('UTG'); }
+                  else if (s === 'open') { setHeroPos('UTG'); }
+                  else if (s === 'vsOpen') { setHeroPos('HJ'); setOpenerPos('UTG'); }
+                  else if (s === 'vs3Bet') { setHeroPos('UTG'); }
+                }}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   scenarioType === s
                     ? 'bg-indigo-600 text-white'
