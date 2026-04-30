@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useMemo } from 'react';
 import type { Mode, Position, RangeWidth, HandEntry } from './types';
 import { RANGE_WIDTH_LABELS } from './types';
