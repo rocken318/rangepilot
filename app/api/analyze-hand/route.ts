@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 const SYSTEM_PROMPT = `あなたは6max NLHキャッシュゲームのポーカー学習コーチです。
@@ -31,84 +31,53 @@ function buildUserPrompt(body: Record<string, unknown>): string {
   const o = (body.opponent ?? {}) as Record<string, string>;
   return `以下のハンドをプレイ後レビューしてください。
 
-【自分のハンド】
-${body.heroHand ?? ''}
-
-【自分のポジション】
-${body.heroPosition ?? ''}
-
-【ブラインド】
-${body.blinds ?? ''}
-
-【有効スタック】
-${body.effectiveStack ?? ''}
-
-【プリフロップ】
-${body.preflopAction ?? ''}
-
-【フロップ】
-${body.flopAction ?? ''}
-
-【ターン】
-${body.turnAction ?? ''}
-
-【リバー】
-${body.riverAction ?? ''}
-
-【相手】
-${o.name ?? ''}
-
-【相手スタッツ】
-VPIP: ${o.vpip ?? ''}
-PFR: ${o.pfr ?? ''}
-3BET: ${o.threeBet ?? ''}
-Fold to 3Bet: ${o.foldToThreeBet ?? ''}
-C-Bet: ${o.cbet ?? ''}
-Fold to C-Bet: ${o.foldToCbet ?? ''}
-Steal: ${o.steal ?? ''}
-Check/Raise: ${o.checkRaise ?? ''}
-WTSD: ${o.wtsd ?? ''}
-WSD: ${o.wsd ?? ''}
-
-【自分の判断】
-${body.heroDecision ?? ''}
-
-【結果】
-${body.result ?? ''}
-
-【自由メモ】
-${body.memo ?? ''}`;
+【自分のハンド】${body.heroHand ?? ''}
+【自分のポジション】${body.heroPosition ?? ''}
+【ブラインド】${body.blinds ?? ''}
+【有効スタック】${body.effectiveStack ?? ''}
+【プリフロップ】${body.preflopAction ?? ''}
+【フロップ】${body.flopAction ?? ''}
+【ターン】${body.turnAction ?? ''}
+【リバー】${body.riverAction ?? ''}
+【相手】${o.name ?? ''}
+【相手スタッツ】VPIP:${o.vpip ?? ''} PFR:${o.pfr ?? ''} 3BET:${o.threeBet ?? ''} FoldTo3B:${o.foldToThreeBet ?? ''} CBet:${o.cbet ?? ''} FoldToCB:${o.foldToCbet ?? ''} Steal:${o.steal ?? ''} CR:${o.checkRaise ?? ''} WTSD:${o.wtsd ?? ''} WSD:${o.wsd ?? ''}
+【自分の判断】${body.heroDecision ?? ''}
+【結果】${body.result ?? ''}
+【自由メモ】${body.memo ?? ''}`;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
+}
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({
-      error: 'OpenAI API key is not configured. Set OPENAI_API_KEY in Vercel Environment Variables.',
-    });
+    return NextResponse.json(
+      { error: 'OpenAI API key is not configured.' },
+      { status: 500, headers: CORS_HEADERS }
+    );
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400, headers: CORS_HEADERS });
+  }
+
+  if (!body.heroHand) {
+    return NextResponse.json({ error: 'heroHand is required' }, { status: 400, headers: CORS_HEADERS });
   }
 
   try {
-    const body = req.body as Record<string, unknown>;
-    if (!body.heroHand) {
-      return res.status(400).json({ error: 'heroHand is required' });
-    }
-
     const openai = new OpenAI({ apiKey });
-
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       temperature: 0.3,
@@ -122,12 +91,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      return res.status(502).json({ error: 'Empty response from OpenAI' });
+      return NextResponse.json({ error: 'Empty response from OpenAI' }, { status: 502, headers: CORS_HEADERS });
     }
 
     const parsed = JSON.parse(content);
-
-    // Validate required fields with defaults
     const result = {
       summary: parsed.summary ?? '',
       goodPoints: Array.isArray(parsed.goodPoints) ? parsed.goodPoints : [],
@@ -138,9 +105,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       severity: ['low', 'medium', 'high'].includes(parsed.severity) ? parsed.severity : 'medium',
     };
 
-    return res.status(200).json(result);
+    return NextResponse.json(result, { headers: CORS_HEADERS });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return res.status(500).json({ error: `AI analysis failed: ${message}` });
+    return NextResponse.json(
+      { error: `AI analysis failed: ${message}` },
+      { status: 500, headers: CORS_HEADERS }
+    );
   }
 }
