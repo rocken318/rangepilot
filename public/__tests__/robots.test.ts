@@ -10,7 +10,6 @@ describe('robots.txt', () => {
   });
 
   it('includes sitemap reference', () => {
-    expect(content).toContain('Sitemap:');
-    expect(content).toContain('sitemap.xml');
+    expect(content).toContain('Sitemap: https://rangepilot.vercel.app/sitemap.xml');
   });
 });
