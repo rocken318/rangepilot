@@ -278,7 +278,7 @@ export default function PracticeModeView({ safeMode }: Props) {
 
           {/* Seat badges — hero always at slot 0 (bottom-center), counter-clockwise on screen = clockwise at table */}
           {DISPLAY_SLOT_POSITIONS.map((slotStyle, slotIdx) => {
-          const posIdx = (heroIdx + slotIdx) % POSITION_ORDER.length;
+          const posIdx = (heroIdx - slotIdx + POSITION_ORDER.length) % POSITION_ORDER.length;
           const pos = POSITION_ORDER[posIdx];
           const isHero = slotIdx === 0;
           const isOpener = pos === currentQuestion.openerPosition;
