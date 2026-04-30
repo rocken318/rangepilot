@@ -22,6 +22,8 @@ const ACTION_NAMES: Record<Action, string> = {
   fold: 'フォールド',
   '4betValue': '4ベット(V)',
   '4betBluff': '4ベット(B)',
+  bet: 'ベット',
+  check: 'チェック',
 };
 
 function getActionBadgeClass(action: Action): string {

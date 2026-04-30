@@ -25,6 +25,8 @@ const ACTION_NAMES: Record<Action, string> = {
   fold: 'フォールド',
   '4betValue': '4ベット(V)',
   '4betBluff': '4ベット(B)',
+  bet: 'ベット',
+  check: 'チェック',
 };
 
 const ACTION_COLORS: Record<Action, string> = {
@@ -37,6 +39,8 @@ const ACTION_COLORS: Record<Action, string> = {
   fold: 'text-gray-500',
   '4betValue': 'text-purple-400',
   '4betBluff': 'text-purple-300',
+  bet: 'text-emerald-400',
+  check: 'text-slate-400',
 };
 
 function getActionBadgeClass(action: Action): string {

@@ -18,6 +18,8 @@ const ACTION_TEXT: Record<Action, string> = {
   fold: 'Fold',
   '4betValue': '4Bet-Value',
   '4betBluff': '4Bet-Bluff',
+  bet: 'Bet',
+  check: 'Check',
 };
 
 export default function ExportControls({ range, scenarioLabel }: Props) {

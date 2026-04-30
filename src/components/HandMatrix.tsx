@@ -21,6 +21,8 @@ const ACTION_COLORS: Record<string, Record<Action, string>> = {
     '4betValue': 'bg-purple-600 hover:bg-purple-500 text-white',
     '4betBluff': 'bg-purple-600 hover:bg-purple-500 text-white',
     '3bet': 'bg-red-600 hover:bg-red-500 text-white',
+    bet: 'bg-emerald-600 hover:bg-emerald-500 text-white',
+    check: 'bg-slate-600 hover:bg-slate-500 text-white',
   },
   vsOpen: {
     '3betValue': 'bg-red-600 hover:bg-red-500 text-white',
@@ -32,6 +34,8 @@ const ACTION_COLORS: Record<string, Record<Action, string>> = {
     '4betValue': 'bg-purple-600 hover:bg-purple-500 text-white',
     '4betBluff': 'bg-purple-600 hover:bg-purple-500 text-white',
     '3bet': 'bg-red-600 hover:bg-red-500 text-white',
+    bet: 'bg-emerald-600 hover:bg-emerald-500 text-white',
+    check: 'bg-slate-600 hover:bg-slate-500 text-white',
   },
   vs3Bet: {
     '4betValue': 'bg-purple-700 hover:bg-purple-600 text-white',
@@ -43,6 +47,8 @@ const ACTION_COLORS: Record<string, Record<Action, string>> = {
     '3betValue': 'bg-red-600 hover:bg-red-500 text-white',
     '3betBluff': 'bg-rose-500 hover:bg-rose-400 text-white',
     '3bet': 'bg-red-600 hover:bg-red-500 text-white',
+    bet: 'bg-emerald-600 hover:bg-emerald-500 text-white',
+    check: 'bg-slate-600 hover:bg-slate-500 text-white',
   },
   bbDefense: {
     '3bet': 'bg-red-600 hover:bg-red-500 text-white',
@@ -54,6 +60,8 @@ const ACTION_COLORS: Record<string, Record<Action, string>> = {
     raise: 'bg-red-600 hover:bg-red-500 text-white',
     '4betValue': 'bg-purple-600 hover:bg-purple-500 text-white',
     '4betBluff': 'bg-purple-600 hover:bg-purple-500 text-white',
+    bet: 'bg-emerald-600 hover:bg-emerald-500 text-white',
+    check: 'bg-slate-600 hover:bg-slate-500 text-white',
   },
 };
 
@@ -67,6 +75,8 @@ const ACTION_LABELS: Record<Action, string> = {
   fold: 'F',
   '4betValue': '4B-V',
   '4betBluff': '4B-B',
+  bet: 'B',
+  check: 'Ch',
 };
 
 export default function HandMatrix({ range, onSelectHand, selectedHand, colorScheme, safeMode }: Props) {
