@@ -1,4 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+beforeEach(() => {
+  vi.resetModules();
+  process.env.DEEPL_API_KEY = 'test-key:fx';
+});
 
 describe('translateToJapanese', () => {
   it('returns translated text from DeepL API response', async () => {
