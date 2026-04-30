@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
+
 const SYSTEM_PROMPT = `あなたは6max NLHキャッシュゲームのポーカー学習コーチです。
 目的はユーザーの上達支援であり、実戦中のリアルタイム意思決定支援ではありません。
 回答はプレイ後レビューとして行ってください。
@@ -57,8 +61,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  if (!openai) {
     return NextResponse.json(
       { error: 'OpenAI API key is not configured.' },
       { status: 500, headers: CORS_HEADERS }
@@ -77,7 +80,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const openai = new OpenAI({ apiKey });
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       temperature: 0.3,
