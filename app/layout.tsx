@@ -39,6 +39,19 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
+        <Script
+          id="ga-load"
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-EQL8P2P3KC"
+        />
+        <Script id="ga-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-EQL8P2P3KC');
+          `}
+        </Script>
         {MEDIA_NET_SITE_ID && (
           <Script
             id="media-net"
