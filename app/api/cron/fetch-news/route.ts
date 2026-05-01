@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
 
       const existingUrls = new Set((existing ?? []).map((e: { source_url: string }) => e.source_url));
       const newArticles = articles.filter((a) => !existingUrls.has(a.url));
+      console.log(`[${feed.source}] fetched=${articles.length} new=${newArticles.length}`);
       if (newArticles.length === 0) continue;
 
       const titlesToTranslate = newArticles.map((a) => a.title);
@@ -55,8 +56,10 @@ export async function GET(req: NextRequest) {
 
       const { error } = await supabaseAdmin.from('articles').insert(rows);
       if (error) {
+        console.error(`INSERT ERROR [${feed.source}]:`, JSON.stringify(error));
         errors.push(`${feed.source}: ${error.message}`);
       } else {
+        console.log(`INSERT OK [${feed.source}]: ${rows.length} rows`);
         totalInserted += rows.length;
       }
     } catch (err) {
