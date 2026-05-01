@@ -16,7 +16,8 @@ export type Mode =
   | 'aiReview'
   | 'practiceMode'
   | 'handHistoryAnalyzer'
-  | 'gtoGuide';
+  | 'gtoGuide'
+  | 'books';
 
 export type RangeWidth = 'ultraTight' | 'tight' | 'standard' | 'loose' | 'ultraLoose';
 
@@ -67,6 +68,7 @@ export const MODE_LABELS: Record<Mode, string> = {
   practiceMode: '練習',
   handHistoryAnalyzer: 'ハンド履歴解析',
   gtoGuide: 'GTOガイド',
+  books: '📚 参考書籍',
 };
 
 export const RANGE_WIDTH_LABELS: Record<RangeWidth, string> = {

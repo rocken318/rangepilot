@@ -23,6 +23,7 @@ import AIReviewView from './components/AIReviewView';
 import PracticeModeView from './components/PracticeModeView';
 import HandHistoryAnalyzer from './components/HandHistoryAnalyzer';
 import GTOGuideView from './components/GTOGuideView';
+import BooksView from './components/BooksView';
 import Assumptions from './components/Assumptions';
 
 export default function App() {
@@ -35,7 +36,7 @@ export default function App() {
   const [sbVsBbScenario, setSbVsBbScenario] = useState<'sbOpen' | 'bbDefVsSb'>('sbOpen');
   const [safeMode, setSafeMode] = useState(false);
 
-  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'practiceMode', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview', 'handHistoryAnalyzer', 'gtoGuide'];
+  const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'practiceMode', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview', 'handHistoryAnalyzer', 'gtoGuide', 'books'];
 
   function getAvailableScenarios(pos: Position): { mode: Mode; sbScenario?: 'sbOpen' | 'bbDefVsSb' }[] {
     switch (pos) {
@@ -184,11 +185,19 @@ export default function App() {
                 6max NLH プリフロップレンジ & ガイド
               </p>
             </div>
-            {safeMode && (
-              <div className="bg-green-600/20 border border-green-600/50 rounded-lg px-4 py-2">
-                <span className="text-sm font-bold text-green-400">安全寄りモード ON</span>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              <a
+                href="/news"
+                className="text-xs text-gray-400 hover:text-yellow-400 transition-colors font-semibold"
+              >
+                🃏 ニュース
+              </a>
+              {safeMode && (
+                <div className="bg-green-600/20 border border-green-600/50 rounded-lg px-4 py-2">
+                  <span className="text-sm font-bold text-green-400">安全寄りモード ON</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -250,6 +259,7 @@ export default function App() {
         {mode === 'practiceMode' && <PracticeModeView safeMode={safeMode} />}
         {mode === 'handHistoryAnalyzer' && <HandHistoryAnalyzer safeMode={safeMode} />}
         {mode === 'gtoGuide' && <GTOGuideView />}
+        {mode === 'books' && <BooksView />}
 
         {showMatrix && (
           <>
