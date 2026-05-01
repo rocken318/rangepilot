@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -28,6 +29,8 @@ export const metadata: Metadata = {
   },
 };
 
+const MEDIA_NET_SITE_ID = process.env.NEXT_PUBLIC_MEDIA_NET_SITE_ID ?? '';
+
 export default function RootLayout({
   children,
 }: {
@@ -35,7 +38,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {MEDIA_NET_SITE_ID && (
+          <Script
+            id="media-net"
+            strategy="afterInteractive"
+            src={`//contextual.media.net/dmedianet.js?cid=${MEDIA_NET_SITE_ID}`}
+          />
+        )}
+        {children}
+      </body>
     </html>
   );
 }
