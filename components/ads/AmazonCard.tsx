@@ -8,7 +8,7 @@ interface Props {
 
 export default function AmazonCard({ asin, title, author, imageUrl, price }: Props) {
   const tag = process.env.NEXT_PUBLIC_AMAZON_ASSOCIATE_TAG ?? '';
-  const url = `https://www.amazon.co.jp/dp/${asin}?tag=${tag}`;
+  const url = `https://www.amazon.co.jp/s?k=${encodeURIComponent(title)}&tag=${tag}`;
 
   return (
     <a
