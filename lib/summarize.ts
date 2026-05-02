@@ -13,31 +13,29 @@ export async function summarizeBatch(articles: ArticleInput[]): Promise<ArticleO
 ルール:
 - title_ja: タイトルを自然な日本語に翻訳
 - summary_ja: 内容を2〜3文の自然な日本語要約に。宣伝文句・「The post appeared first on...」等は除外
-- 必ず {"results": [...]} の形式で返す
 
 入力:
 ${JSON.stringify(articles, null, 2)}
 
-出力形式（必ずこの形式）:
-{"results": [{"title_ja": "...", "summary_ja": "..."}, ...]}`;
+JSON配列のみ出力（説明不要）:
+[{"title_ja": "...", "summary_ja": "..."}, ...]`;
 
   const response = await client.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
     temperature: 0.3,
   });
 
-  const content = response.choices[0]?.message?.content ?? '{}';
-  const parsed = JSON.parse(content) as Record<string, unknown>;
+  const content = response.choices[0]?.message?.content ?? '';
 
-  // Find the array in the response regardless of key name
-  const results: ArticleOutput[] = (() => {
-    for (const val of Object.values(parsed)) {
-      if (Array.isArray(val) && val.length > 0) return val as ArticleOutput[];
-    }
-    return [];
-  })();
+  // Extract JSON array from response
+  const match = content.match(/\[[\s\S]*\]/);
+  if (!match) {
+    console.error('[summarize] no JSON array found in response:', content.slice(0, 200));
+    return articles.map((a) => ({ title_ja: a.title, summary_ja: a.summary }));
+  }
+
+  const results: ArticleOutput[] = JSON.parse(match[0]);
 
   // Fallback: if count mismatch, return originals
   if (results.length !== articles.length) {
