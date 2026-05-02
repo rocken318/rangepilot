@@ -79,6 +79,18 @@ export const RANGE_WIDTH_LABELS: Record<RangeWidth, string> = {
   ultraLoose: '超広め',
 };
 
+export type StackDepth = '100' | '50' | '20' | '15' | '10';
+
+export const STACK_DEPTH_LABELS: Record<StackDepth, string> = {
+  '100': '100BB',
+  '50': '50BB',
+  '20': '20BB',
+  '15': '15BB',
+  '10': '10BB',
+};
+
+export const SHORT_STACK_DEPTHS: StackDepth[] = ['20', '15', '10'];
+
 export const VILLAIN_TYPE_LABELS: Record<VillainType, string> = {
   standard: '標準',
   tight: 'タイト',
