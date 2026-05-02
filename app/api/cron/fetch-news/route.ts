@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { fetchRssArticles } from '../../../../lib/rss';
-import { translateBatch } from '../../../../lib/deepl';
+import { summarizeBatch } from '../../../../lib/summarize';
 import { supabaseAdmin } from '../../../../lib/supabase';
 
 const RSS_SOURCES = [
@@ -35,20 +35,15 @@ export async function GET(req: NextRequest) {
       console.log(`[${feed.source}] fetched=${articles.length} new=${newArticles.length}`);
       if (newArticles.length === 0) continue;
 
-      const titlesToTranslate = newArticles.map((a) => a.title);
-      const summariesToTranslate = newArticles.map((a) => a.summary || a.title);
-
-      const [titlesJa, summariesJa] = await Promise.all([
-        translateBatch(titlesToTranslate),
-        translateBatch(summariesToTranslate),
-      ]);
+      const inputs = newArticles.map((a) => ({ title: a.title, summary: a.summary || a.title }));
+      const translated = await summarizeBatch(inputs);
 
       const rows = newArticles.map((a, i) => ({
         source_url: a.url,
         title_en: a.title,
-        title_ja: titlesJa[i],
+        title_ja: translated[i]?.title_ja ?? a.title,
         summary_en: a.summary || null,
-        summary_ja: summariesJa[i] || null,
+        summary_ja: translated[i]?.summary_ja ?? null,
         image_url: a.imageUrl,
         source: a.source,
         category: a.category,
