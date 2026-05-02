@@ -5,9 +5,9 @@ import { summarizeBatch } from '../../../../lib/summarize';
 import { supabaseAdmin } from '../../../../lib/supabase';
 
 const RSS_SOURCES = [
-  { url: 'https://www.pokerfuse.com/feed', source: 'pokerfuse', category: 'general' },
-  { url: 'https://www.pokerlistings.com/feed', source: 'pokerlistings', category: 'general' },
   { url: 'https://upswingpoker.com/feed', source: 'upswingpoker', category: 'strategy' },
+  { url: 'https://www.worldpokertour.com/news/feed/', source: 'wpt', category: 'tournament' },
+  { url: 'https://www.pokerstrategy.com/feed/', source: 'pokerstrategy', category: 'strategy' },
 ] as const;
 
 export async function GET(req: NextRequest) {
