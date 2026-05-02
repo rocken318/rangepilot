@@ -46,6 +46,7 @@ const sf = (high: string, from: string, to: string): string[] => {
 function makePushRange(position: string, stackBB: StackDepth): Record<string, HandEntry> {
   const r = emptyRange();
   const note = `${stackBB}BB: 全イン（プッシュ）推奨`;
+  if (stackBB !== '10' && stackBB !== '15' && stackBB !== '20') return r;
 
   if (stackBB === '10') {
     if (position === 'UTG') {
@@ -139,6 +140,7 @@ function makePushRange(position: string, stackBB: StackDepth): Record<string, Ha
 function makeCallRange(pusherPos: string, stackBB: StackDepth): Record<string, HandEntry> {
   const r = emptyRange();
   const note = `${stackBB}BB: コール推奨（vs ${pusherPos} プッシュ）`;
+  if (stackBB !== '10' && stackBB !== '15' && stackBB !== '20') return r;
 
   if (stackBB === '10') {
     if (pusherPos === 'UTG') {
@@ -200,9 +202,8 @@ function makeCallRange(pusherPos: string, stackBB: StackDepth): Record<string, H
       setHands(r, pp('J', 'A'), 'call', note);
       setHands(r, ['AQs','AKs','AKo','KQs'], 'call', note);
     } else if (pusherPos === 'CO') {
-      setHands(r, pp('T', 'A'), 'call', note);
-      setHands(r, sf('A','K','J'), 'call', note);
-      setHands(r, ['AQo','AKo','KQs'], 'call', note);
+      setHands(r, pp('J', 'A'), 'call', note);
+      setHands(r, ['AQs','AKs','AKo','KQs'], 'call', note);
     } else if (pusherPos === 'BTN') {
       setHands(r, pp('8', 'A'), 'call', note);
       setHands(r, sf('A','K','T'), 'call', note);
