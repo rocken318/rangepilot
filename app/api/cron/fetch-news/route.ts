@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { fetchRssArticles } from '../../../../lib/rss';
 import { translateBatch } from '../../../../lib/deepl';
 import { supabaseAdmin } from '../../../../lib/supabase';
@@ -65,6 +66,10 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       errors.push(`${feed.source}: ${err instanceof Error ? err.message : 'unknown'}`);
     }
+  }
+
+  if (totalInserted > 0) {
+    revalidatePath('/news');
   }
 
   return NextResponse.json({
