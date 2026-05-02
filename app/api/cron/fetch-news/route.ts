@@ -39,30 +39,28 @@ export async function GET(req: NextRequest) {
       const inputs = newArticles.map((a) => ({ title: a.title, summary: a.summary || a.title }));
       const translated = await summarizeBatch(inputs);
 
-      // Step 2: scrape + generate body_ja + points_ja (per article, sequential to avoid rate limits)
-      const rows = [];
-      for (let i = 0; i < newArticles.length; i++) {
-        const a = newArticles[i];
-        const t = translated[i];
-
-        const bodyEn = await scrapeArticleBody(a.url);
-        const sourceText = bodyEn || a.summary || a.title;
-        const { body_ja, points_ja } = await generateArticle(a.title, sourceText);
-
-        rows.push({
-          source_url: a.url,
-          title_en: a.title,
-          title_ja: t?.title_ja ?? a.title,
-          summary_en: a.summary || null,
-          summary_ja: t?.summary_ja ?? null,
-          image_url: a.imageUrl,
-          source: a.source,
-          category: a.category,
-          published_at: a.publishedAt.toISOString(),
-          body_ja: body_ja || null,
-          points_ja: points_ja.length > 0 ? points_ja : null,
-        });
-      }
+      // Step 2: scrape + generate body_ja + points_ja (parallel)
+      const rows = await Promise.all(
+        newArticles.map(async (a, i) => {
+          const t = translated[i];
+          const bodyEn = await scrapeArticleBody(a.url);
+          const sourceText = bodyEn || a.summary || a.title;
+          const { body_ja, points_ja } = await generateArticle(a.title, sourceText);
+          return {
+            source_url: a.url,
+            title_en: a.title,
+            title_ja: t?.title_ja ?? a.title,
+            summary_en: a.summary || null,
+            summary_ja: t?.summary_ja ?? null,
+            image_url: a.imageUrl,
+            source: a.source,
+            category: a.category,
+            published_at: a.publishedAt.toISOString(),
+            body_ja: body_ja || null,
+            points_ja: points_ja.length > 0 ? points_ja : null,
+          };
+        })
+      );
 
       const { error } = await supabaseAdmin.from('articles').insert(rows);
       if (error) {
