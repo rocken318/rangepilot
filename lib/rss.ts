@@ -46,12 +46,14 @@ export async function fetchRssArticles(
     return items.map((item: unknown) => {
       const i = item as Record<string, unknown>;
       const enclosure = i['enclosure'] as Record<string, string> | undefined;
+      const rawSummary = String(i['description'] ?? i['summary'] ?? '');
+      const summary = rawSummary.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
       return {
         title: String(i['title'] ?? ''),
         url: String(i['link'] ?? ''),
-        summary: String(i['description'] ?? ''),
+        summary,
         imageUrl: enclosure?.['@_url'] ?? null,
-        publishedAt: new Date(String(i['pubDate'] ?? Date.now())),
+        publishedAt: new Date(String(i['pubDate'] ?? i['published'] ?? Date.now())),
         source,
         category,
       };
