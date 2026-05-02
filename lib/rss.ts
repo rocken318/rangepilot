@@ -29,7 +29,12 @@ export async function fetchRssArticles(
     };
 
     const rawItems = parsed.rss?.channel?.item;
-    if (!rawItems) return [];
+    console.log(`[rss] keys:`, Object.keys(parsed));
+    if (parsed.rss) console.log(`[rss] channel keys:`, Object.keys(parsed.rss?.channel ?? {}));
+    if (!rawItems) {
+      console.log(`[rss] no items found in feed: ${feedUrl}`);
+      return [];
+    }
 
     const items = Array.isArray(rawItems) ? rawItems : [rawItems];
 
