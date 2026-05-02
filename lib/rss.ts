@@ -24,15 +24,20 @@ export async function fetchRssArticles(
     if (!res.ok) return [];
 
     const xml = await res.text();
+    if (xml.trimStart().startsWith('<html') || xml.trimStart().startsWith('<!DOCTYPE')) {
+      console.log(`[rss] got HTML instead of XML: ${feedUrl}`);
+      return [];
+    }
+
     const parsed = parser.parse(xml) as {
       rss?: { channel?: { item?: unknown[] | unknown } };
+      feed?: { entry?: unknown[] | unknown };
     };
 
-    const rawItems = parsed.rss?.channel?.item;
-    console.log(`[rss] keys:`, Object.keys(parsed));
-    if (parsed.rss) console.log(`[rss] channel keys:`, Object.keys(parsed.rss?.channel ?? {}));
+    // Support both RSS 2.0 (rss.channel.item) and Atom (feed.entry)
+    const rawItems = parsed.rss?.channel?.item ?? parsed.feed?.entry;
     if (!rawItems) {
-      console.log(`[rss] no items found in feed: ${feedUrl}`);
+      console.log(`[rss] no items found in feed: ${feedUrl}`, Object.keys(parsed));
       return [];
     }
 

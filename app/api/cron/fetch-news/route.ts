@@ -4,9 +4,9 @@ import { translateBatch } from '../../../../lib/deepl';
 import { supabaseAdmin } from '../../../../lib/supabase';
 
 const RSS_SOURCES = [
-  { url: 'https://www.pokernews.com/rss/news.xml', source: 'pokernews', category: 'general' },
-  { url: 'https://www.pokernews.com/rss/tours.xml', source: 'pokernews', category: 'tournament' },
-  { url: 'https://www.cardplayer.com/rss/news', source: 'cardplayer', category: 'general' },
+  { url: 'https://www.pokerfuse.com/feed', source: 'pokerfuse', category: 'general' },
+  { url: 'https://www.pokerlistings.com/feed', source: 'pokerlistings', category: 'general' },
+  { url: 'https://upswingpoker.com/feed', source: 'upswingpoker', category: 'strategy' },
 ] as const;
 
 export async function GET(req: NextRequest) {
