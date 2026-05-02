@@ -1,5 +1,5 @@
-import type { Mode, Position, RangeWidth } from '../types';
-import { MODE_LABELS, RANGE_WIDTH_LABELS } from '../types';
+import type { Mode, Position, RangeWidth, StackDepth } from '../types';
+import { MODE_LABELS, RANGE_WIDTH_LABELS, STACK_DEPTH_LABELS, SHORT_STACK_DEPTHS } from '../types';
 
 interface ScenarioTab {
   label: string;
@@ -38,6 +38,15 @@ const POSITION_SCENARIOS: Record<Position, ScenarioTab[]> = {
   ],
 };
 
+const SHORT_STACK_SCENARIOS: Record<Position, ScenarioTab[]> = {
+  UTG: [{ label: 'プッシュ', mode: 'open' }],
+  HJ: [{ label: 'プッシュ', mode: 'open' }],
+  CO: [{ label: 'プッシュ', mode: 'open' }],
+  BTN: [{ label: 'プッシュ（vs BB）', mode: 'open' }],
+  SB: [{ label: 'プッシュ（vs BB）', mode: 'open' }],
+  BB: [{ label: 'コール vs プッシュ', mode: 'bbDefense' }],
+};
+
 const ALL_POSITIONS: Position[] = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
 const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'practiceMode', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview', 'handHistoryAnalyzer'];
 const rangeWidths: RangeWidth[] = ['ultraTight', 'tight', 'standard', 'loose', 'ultraLoose'];
@@ -69,6 +78,8 @@ interface Props {
   sbVsBbScenario: 'sbOpen' | 'bbDefVsSb';
   safeMode: boolean;
   onSafeModeChange: (v: boolean) => void;
+  stackDepth: StackDepth;
+  onStackDepthChange: (d: StackDepth) => void;
 }
 
 export default function Controls({
@@ -79,12 +90,16 @@ export default function Controls({
   hasAnte, onAnteChange,
   sbVsBbScenario,
   safeMode, onSafeModeChange,
+  stackDepth, onStackDepthChange,
 }: Props) {
+  const isShortStack = SHORT_STACK_DEPTHS.includes(stackDepth);
   const isRangeMode = !UTILITY_MODES.includes(mode);
-  const scenarios = POSITION_SCENARIOS[myPosition];
+  const scenarios = isShortStack ? SHORT_STACK_SCENARIOS[myPosition] : POSITION_SCENARIOS[myPosition];
   const availableOpenerPos = getAvailableOpenerPositions(mode, myPosition);
-  const showOpenerSelect = ['vsOpen', 'bbDefense'].includes(mode);
-  const showRangeWidth = ['open', 'bbDefense', 'sbVsBb'].includes(mode);
+  const showOpenerSelect = (!isShortStack && ['vsOpen', 'bbDefense'].includes(mode))
+    || (isShortStack && mode === 'bbDefense');
+  const showRangeWidth = !isShortStack && ['open', 'bbDefense', 'sbVsBb'].includes(mode);
+  const stackDepths: StackDepth[] = ['100', '50', '20', '15', '10'];
 
   const isScenarioActive = (s: ScenarioTab) => {
     if (s.mode !== mode) return false;
@@ -94,6 +109,23 @@ export default function Controls({
 
   return (
     <div className="space-y-3">
+      {/* Stack depth selector */}
+      <div className="flex flex-wrap justify-center gap-1.5">
+        {stackDepths.map(d => (
+          <button
+            key={d}
+            onClick={() => onStackDepthChange(d)}
+            className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-colors min-h-[44px] ${
+              stackDepth === d
+                ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+            }`}
+          >
+            {STACK_DEPTH_LABELS[d]}
+          </button>
+        ))}
+      </div>
+
       {/* Position selector — always visible, primary control */}
       <div className="flex flex-wrap justify-center gap-1.5">
         {ALL_POSITIONS.map(pos => (
@@ -176,31 +208,33 @@ export default function Controls({
           )}
 
           {/* Ante + Safe mode */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <label className="text-sm text-gray-400 font-medium">アンティ:</label>
+          {!isShortStack && (
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <label className="text-sm text-gray-400 font-medium">アンティ:</label>
+                <button
+                  onClick={() => onAnteChange(!hasAnte)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] ${
+                    hasAnte
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  }`}
+                >
+                  {hasAnte ? 'あり' : 'なし'}
+                </button>
+              </div>
               <button
-                onClick={() => onAnteChange(!hasAnte)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors min-h-[40px] ${
-                  hasAnte
-                    ? 'bg-amber-600 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                onClick={() => onSafeModeChange(!safeMode)}
+                className={`px-4 py-2.5 rounded-lg text-sm font-bold transition-colors border min-h-[44px] ${
+                  safeMode
+                    ? 'bg-green-600 text-white border-green-500 shadow-lg shadow-green-600/20'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-gray-700'
                 }`}
               >
-                {hasAnte ? 'あり' : 'なし'}
+                🛡 {safeMode ? '安全寄りモード ON' : '安全寄りモード'}
               </button>
             </div>
-            <button
-              onClick={() => onSafeModeChange(!safeMode)}
-              className={`px-4 py-2.5 rounded-lg text-sm font-bold transition-colors border min-h-[44px] ${
-                safeMode
-                  ? 'bg-green-600 text-white border-green-500 shadow-lg shadow-green-600/20'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border-gray-700'
-              }`}
-            >
-              🛡 {safeMode ? '安全寄りモード ON' : '安全寄りモード'}
-            </button>
-          </div>
+          )}
         </div>
       )}
 

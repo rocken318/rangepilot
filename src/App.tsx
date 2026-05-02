@@ -7,6 +7,9 @@ import {
   getOpenRange, getVsOpenRange, getVs3BetRange,
   getBBDefenseRange, getSBvsBBRange, applySafeMode,
 } from './data/ranges';
+import { getPushRange, getCallRange } from './data/push-fold';
+import type { StackDepth } from './types';
+import { STACK_DEPTH_LABELS, SHORT_STACK_DEPTHS } from './types';
 import Controls from './components/Controls';
 import HandMatrix from './components/HandMatrix';
 import Legend from './components/Legend';
@@ -35,6 +38,7 @@ export default function App() {
   const [selectedHand, setSelectedHand] = useState<string | null>(null);
   const [sbVsBbScenario, setSbVsBbScenario] = useState<'sbOpen' | 'bbDefVsSb'>('sbOpen');
   const [safeMode, setSafeMode] = useState(false);
+  const [stackDepth, setStackDepth] = useState<StackDepth>('100');
 
   const UTILITY_MODES: Mode[] = ['villainType', 'memo', 'spotTest', 'practiceMode', 'positionGuide', 'postflopGuide', 'glossary', 'learningTracker', 'aiReview', 'handHistoryAnalyzer', 'gtoGuide', 'books'];
 
@@ -51,16 +55,20 @@ export default function App() {
     setMyPosition(pos);
     setSelectedHand(null);
 
+    const isShortStack = SHORT_STACK_DEPTHS.includes(stackDepth);
+    if (isShortStack) {
+      setMode(pos === 'BB' ? 'bbDefense' : 'open');
+      return;
+    }
+
     const scenarios = getAvailableScenarios(pos);
 
-    // If in utility mode, switch to first range scenario for this position
     if (UTILITY_MODES.includes(mode)) {
       setMode(scenarios[0].mode);
       if (scenarios[0].sbScenario) setSbVsBbScenario(scenarios[0].sbScenario);
       return;
     }
 
-    // Check if current mode is still available for new position
     const stillAvailable = scenarios.some(s => {
       if (s.mode !== mode) return false;
       if (s.mode === 'sbVsBb' && s.sbScenario !== sbVsBbScenario) return false;
@@ -72,7 +80,6 @@ export default function App() {
       if (scenarios[0].sbScenario) setSbVsBbScenario(scenarios[0].sbScenario);
     }
 
-    // Adjust opener if it conflicts with new position
     const effectiveMode = stillAvailable ? mode : scenarios[0].mode;
     if (effectiveMode === 'vsOpen') {
       const posOrder: Position[] = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
@@ -105,7 +112,27 @@ export default function App() {
     setSelectedHand(null);
   };
 
+  const handleStackDepthChange = (depth: StackDepth) => {
+    setStackDepth(depth);
+    const isShortStack = SHORT_STACK_DEPTHS.includes(depth);
+    if (isShortStack) {
+      if (UTILITY_MODES.includes(mode)) return;
+      const validModes: Mode[] = myPosition === 'BB' ? ['bbDefense'] : ['open'];
+      if (!validModes.includes(mode)) {
+        setMode(myPosition === 'BB' ? 'bbDefense' : 'open');
+      }
+    }
+  };
+
   const range = useMemo((): Record<string, HandEntry> => {
+    const isShortStack = SHORT_STACK_DEPTHS.includes(stackDepth);
+
+    if (isShortStack) {
+      if (mode === 'open') return getPushRange(myPosition, stackDepth);
+      if (mode === 'bbDefense') return getCallRange(openerPosition, stackDepth);
+      return {};
+    }
+
     let base: Record<string, HandEntry>;
     switch (mode) {
       case 'open':
@@ -131,28 +158,37 @@ export default function App() {
       return applySafeMode(base, safeModeKey);
     }
     return base;
-  }, [mode, myPosition, openerPosition, rangeWidth, sbVsBbScenario, safeMode]);
+  }, [mode, myPosition, openerPosition, rangeWidth, sbVsBbScenario, safeMode, stackDepth]);
 
   const scenarioLabel = useMemo(() => {
+    const isShortStack = SHORT_STACK_DEPTHS.includes(stackDepth);
+    const stackLabel = STACK_DEPTH_LABELS[stackDepth];
     const anteStr = hasAnte ? 'アンティあり' : 'アンティなし';
     const safeStr = safeMode ? ' / 安全寄り' : '';
+
+    if (isShortStack) {
+      if (mode === 'open') return `${myPosition} プッシュ / ${stackLabel} / ${anteStr}`;
+      if (mode === 'bbDefense') return `BB vs ${openerPosition} プッシュ / ${stackLabel}`;
+      return '';
+    }
+
     switch (mode) {
       case 'open':
-        return `${myPosition} Open / ${RANGE_WIDTH_LABELS[rangeWidth]} / 100BB / ${anteStr}${safeStr}`;
+        return `${myPosition} Open / ${RANGE_WIDTH_LABELS[rangeWidth]} / ${stackLabel} / ${anteStr}${safeStr}`;
       case 'vsOpen':
-        return `${myPosition} vs ${openerPosition} Open / 100BB / ${anteStr}${safeStr}`;
+        return `${myPosition} vs ${openerPosition} Open / ${stackLabel} / ${anteStr}${safeStr}`;
       case 'vs3Bet':
-        return `${myPosition} Open vs 3Bet / 100BB / ${anteStr}${safeStr}`;
+        return `${myPosition} Open vs 3Bet / ${stackLabel} / ${anteStr}${safeStr}`;
       case 'bbDefense':
-        return `BB vs ${openerPosition} Open / ${RANGE_WIDTH_LABELS[rangeWidth]} / 100BB / ${anteStr}${safeStr}`;
+        return `BB vs ${openerPosition} Open / ${RANGE_WIDTH_LABELS[rangeWidth]} / ${stackLabel} / ${anteStr}${safeStr}`;
       case 'sbVsBb':
         return sbVsBbScenario === 'sbOpen'
-          ? `SB Open vs BB / ${RANGE_WIDTH_LABELS[rangeWidth]} / 100BB / ${anteStr}${safeStr}`
-          : `BB Defense vs SB Open / 100BB / ${anteStr}${safeStr}`;
+          ? `SB Open vs BB / ${RANGE_WIDTH_LABELS[rangeWidth]} / ${stackLabel} / ${anteStr}${safeStr}`
+          : `BB Defense vs SB Open / ${stackLabel} / ${anteStr}${safeStr}`;
       default:
         return '';
     }
-  }, [mode, myPosition, openerPosition, rangeWidth, hasAnte, sbVsBbScenario, safeMode]);
+  }, [mode, myPosition, openerPosition, rangeWidth, hasAnte, sbVsBbScenario, safeMode, stackDepth]);
 
   const colorScheme = (() => {
     switch (mode) {
@@ -218,6 +254,8 @@ export default function App() {
           sbVsBbScenario={sbVsBbScenario}
           safeMode={safeMode}
           onSafeModeChange={setSafeMode}
+          stackDepth={stackDepth}
+          onStackDepthChange={handleStackDepthChange}
         />
 
         {showMatrix && (
