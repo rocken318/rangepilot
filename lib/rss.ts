@@ -62,3 +62,52 @@ export async function fetchRssArticles(
     return [];
   }
 }
+
+export async function scrapeArticleBody(url: string): Promise<string> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'RangePilot/1.0 (poker news aggregator)' },
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) return '';
+
+    const html = await res.text();
+
+    // Extract text from content containers in priority order
+    const selectors = [
+      /<article[^>]*>([\s\S]*?)<\/article>/i,
+      /<main[^>]*>([\s\S]*?)<\/main>/i,
+      /class="[^"]*entry-content[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      /class="[^"]*post-content[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+    ];
+
+    let raw = '';
+    for (const sel of selectors) {
+      const m = html.match(sel);
+      if (m?.[1]) { raw = m[1]; break; }
+    }
+    if (!raw) return '';
+
+    // Strip tags and clean up whitespace
+    const text = raw
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Return first 3000 chars
+    return text.slice(0, 3000);
+  } catch {
+    return '';
+  }
+}

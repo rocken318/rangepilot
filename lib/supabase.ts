@@ -22,4 +22,6 @@ export type Article = {
   category: string;
   published_at: string;
   fetched_at: string;
+  body_ja: string | null;
+  points_ja: string[] | null;
 };

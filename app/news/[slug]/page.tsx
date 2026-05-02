@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = decodeURIComponent(slug);
   const { data } = await supabase
     .from('articles')
-    .select('title_ja, summary_ja')
+    .select('title_ja, summary_ja, body_ja')
     .eq('source_url', url)
     .single();
 
@@ -36,5 +36,14 @@ export default async function ArticleDetailPage({ params }: Props) {
 
   if (!article) notFound();
 
-  return <ArticleDetailClient article={article} />;
+  // Fetch related articles (same category, exclude current)
+  const { data: related } = await supabase
+    .from('articles')
+    .select('*')
+    .eq('category', article.category)
+    .neq('source_url', url)
+    .order('published_at', { ascending: false })
+    .limit(3);
+
+  return <ArticleDetailClient article={article} related={related ?? []} />;
 }
